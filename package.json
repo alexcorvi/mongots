@@ -1,6 +1,6 @@
 {
 	"name": "mongots",
-	"version": "0.0.2",
+	"version": "0.1.1",
 	"description": "An Abstraction layer for mongodb for ease of use with TypeScript",
 	"main": "./dist/index.js",
 	"directories": {
