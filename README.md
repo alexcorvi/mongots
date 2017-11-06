@@ -1,5 +1,7 @@
 # Mongots: 
 
+![](https://i.imgur.com/XWz8xDH.png)
+
 ## What is this
 
 An abstraction layer aimed for better API design and stronger type declarations for better experience with TypeScript and MongoDB.
