@@ -50,6 +50,7 @@ function collectionConstructor(db) {
          */
         read({ filter, skip, limit, sort = undefined }) {
             return __awaiter(this, void 0, void 0, function* () {
+                filter = fixDeep(filter || {});
                 const cursor = (yield this._collection()).find(filter);
                 if (sort) {
                     const sortObj = {};
@@ -70,6 +71,7 @@ function collectionConstructor(db) {
          */
         updateMany({ filter, update }) {
             return __awaiter(this, void 0, void 0, function* () {
+                filter = fixDeep(filter || {});
                 return (yield this._collection()).updateMany(filter, update);
             });
         }
@@ -78,6 +80,7 @@ function collectionConstructor(db) {
          */
         updateOne({ filter, update }) {
             return __awaiter(this, void 0, void 0, function* () {
+                filter = fixDeep(filter || {});
                 return (yield this._collection()).updateOne(filter, update);
             });
         }
@@ -86,6 +89,7 @@ function collectionConstructor(db) {
          */
         replaceOne({ filter, document, upsert }) {
             return __awaiter(this, void 0, void 0, function* () {
+                filter = fixDeep(filter || {});
                 return (yield this._collection()).updateOne(filter, document, { upsert });
             });
         }
@@ -95,6 +99,7 @@ function collectionConstructor(db) {
          */
         deleteMany({ filter }) {
             return __awaiter(this, void 0, void 0, function* () {
+                filter = fixDeep(filter || {});
                 return (yield this._collection()).deleteMany(filter);
             });
         }
@@ -103,6 +108,7 @@ function collectionConstructor(db) {
          */
         deleteOne({ filter }) {
             return __awaiter(this, void 0, void 0, function* () {
+                filter = fixDeep(filter || {});
                 return (yield this._collection()).deleteOne(filter);
             });
         }
@@ -111,6 +117,7 @@ function collectionConstructor(db) {
          */
         count({ filter, limit }) {
             return __awaiter(this, void 0, void 0, function* () {
+                filter = fixDeep(filter || {});
                 return yield (yield this._collection()).count(filter || {}, { limit });
             });
         }
@@ -119,6 +126,7 @@ function collectionConstructor(db) {
          */
         readDistinct({ key, filter }) {
             return __awaiter(this, void 0, void 0, function* () {
+                filter = fixDeep(filter || {});
                 return yield (yield this._collection()).distinct(key, filter || {});
             });
         }
@@ -151,3 +159,8 @@ function collectionConstructor(db) {
     };
 }
 exports.collectionConstructor = collectionConstructor;
+function fixDeep(input) {
+    const result = Object.assign(input, input.$deep);
+    delete result.$deep;
+    return result;
+}

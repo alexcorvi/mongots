@@ -1,10 +1,10 @@
 import { Db, InsertWriteOpResult, UpdateWriteOpResult, DeleteWriteOpResultObject, Collection, InsertOneWriteOpResult } from 'mongodb';
-import * as Interfaces from './interfaces';
+import { FieldLevelQueryOperators, UpdateOperators, TopLevelQueryOperators, ConnectionParams } from './interfaces';
 export declare class Connect {
     private url;
     private options;
     private _database;
-    constructor({url, options}: Interfaces.ConnectionParams);
+    constructor({url, options}: ConnectionParams);
     private _connect();
     readonly collection: {
         new <Schema>(collection: string): {
@@ -17,9 +17,11 @@ export declare class Connect {
                 documents: Schema[];
             }): Promise<InsertWriteOpResult>;
             read({filter, skip, limit, sort}: {
-                filter?: {} | {
-                    [key in keyof Schema]: Interfaces.FieldLevelOperators;
-                } | Interfaces.TopLevelOperators<Schema> | undefined;
+                filter?: ({
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>) | undefined;
                 skip?: number | undefined;
                 limit?: number | undefined;
                 sort?: {
@@ -28,35 +30,59 @@ export declare class Connect {
                 } | undefined;
             }): Promise<Schema[]>;
             updateMany({filter, update}: {
-                filter: Interfaces.Filter<Schema>;
-                update: Interfaces.UpdateOperators<Schema>;
+                filter: {
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>;
+                update: UpdateOperators<Schema>;
             }): Promise<UpdateWriteOpResult>;
             updateOne({filter, update}: {
-                filter: Interfaces.Filter<Schema>;
-                update: Interfaces.UpdateOperators<Schema>;
+                filter: {
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>;
+                update: UpdateOperators<Schema>;
             }): Promise<UpdateWriteOpResult>;
             replaceOne({filter, document, upsert}: {
-                filter: Interfaces.Filter<Schema>;
+                filter: {
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>;
                 document: Schema;
                 upsert?: boolean | undefined;
             }): Promise<UpdateWriteOpResult>;
             deleteMany({filter}: {
-                filter: Interfaces.Filter<Schema>;
+                filter: {
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>;
             }): Promise<DeleteWriteOpResultObject>;
             deleteOne({filter}: {
-                filter: Interfaces.Filter<Schema>;
+                filter: {
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>;
             }): Promise<DeleteWriteOpResultObject>;
             count({filter, limit}: {
-                filter?: {} | {
-                    [key in keyof Schema]: Interfaces.FieldLevelOperators;
-                } | Interfaces.TopLevelOperators<Schema> | undefined;
+                filter?: ({
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>) | undefined;
                 limit?: number | undefined;
             }): Promise<number>;
             readDistinct<Type>({key, filter}: {
                 key: keyof Schema;
-                filter?: {} | {
-                    [key in keyof Schema]: Interfaces.FieldLevelOperators;
-                } | Interfaces.TopLevelOperators<Schema> | undefined;
+                filter?: ({
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>) | undefined;
             }): Promise<Type[]>;
             drop({name}: {
                 name: string;
@@ -73,9 +99,11 @@ export declare class Connect {
                 dropTarget: boolean;
             }): Promise<void>;
             find: ({filter, skip, limit, sort}: {
-                filter?: {} | {
-                    [key in keyof Schema]: Interfaces.FieldLevelOperators;
-                } | Interfaces.TopLevelOperators<Schema> | undefined;
+                filter?: ({
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>) | undefined;
                 skip?: number | undefined;
                 limit?: number | undefined;
                 sort?: {
@@ -94,15 +122,25 @@ export declare class Connect {
             }) => Promise<InsertWriteOpResult>;
             distinct: <Type>({key, filter}: {
                 key: keyof Schema;
-                filter?: {} | {
-                    [key in keyof Schema]: Interfaces.FieldLevelOperators;
-                } | Interfaces.TopLevelOperators<Schema> | undefined;
+                filter?: ({
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>) | undefined;
             }) => Promise<Type[]>;
             removeOne: ({filter}: {
-                filter: Interfaces.Filter<Schema>;
+                filter: {
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>;
             }) => Promise<DeleteWriteOpResultObject>;
             removeMany: ({filter}: {
-                filter: Interfaces.Filter<Schema>;
+                filter: {
+                    [P in keyof Schema]?: {
+                        [key in keyof Schema]: Schema[key] | FieldLevelQueryOperators<Schema[key]>;
+                    }[P] | undefined;
+                } & TopLevelQueryOperators<Schema>;
             }) => Promise<DeleteWriteOpResultObject>;
         };
     };

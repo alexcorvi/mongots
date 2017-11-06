@@ -11,10 +11,12 @@ import {
 	UpdateOperators,
 	UpdateOperatorsModifiers,
 	Filter,
-	FieldLevelOperators,
-	TopLevelOperators,
-	keys
+	FieldLevelQueryOperators,
+	TopLevelQueryOperators,
+	Keys
 } from './interfaces';
+
+import * as I from './interfaces';
 
 export function collectionConstructor(db: Connect) {
 	return class CollectionC<Schema> {
@@ -56,6 +58,7 @@ export function collectionConstructor(db: Connect) {
 			limit?: number;
 			sort?: { key: string; direction: number };
 		}) {
+			filter = fixDeep(filter || {});
 			const cursor = (await this._collection()).find<Schema>(filter);
 			if (sort) {
 				const sortObj: any = {};
@@ -75,6 +78,7 @@ export function collectionConstructor(db: Connect) {
 		 * Update many documents that meets the specified criteria
 		 */
 		public async updateMany({ filter, update }: { filter: Filter<Schema>; update: UpdateOperators<Schema> }) {
+			filter = fixDeep(filter || {});
 			return (await this._collection()).updateMany(filter, update);
 		}
 
@@ -82,6 +86,7 @@ export function collectionConstructor(db: Connect) {
 		 * Update one document that meets the specified criteria
 		 */
 		public async updateOne({ filter, update }: { filter: Filter<Schema>; update: UpdateOperators<Schema> }) {
+			filter = fixDeep(filter || {});
 			return (await this._collection()).updateOne(filter, update);
 		}
 
@@ -97,6 +102,7 @@ export function collectionConstructor(db: Connect) {
 			document: Schema;
 			upsert?: boolean;
 		}) {
+			filter = fixDeep(filter || {});
 			return (await this._collection()).updateOne(filter, document, { upsert });
 		}
 
@@ -105,6 +111,7 @@ export function collectionConstructor(db: Connect) {
 		 *
 		 */
 		public async deleteMany({ filter }: { filter: Filter<Schema> }) {
+			filter = fixDeep(filter || {});
 			return (await this._collection()).deleteMany(filter);
 		}
 
@@ -112,6 +119,7 @@ export function collectionConstructor(db: Connect) {
 		 * Delete one document that meets the specified criteria
 		 */
 		public async deleteOne({ filter }: { filter: Filter<Schema> }) {
+			filter = fixDeep(filter || {});
 			return (await this._collection()).deleteOne(filter);
 		}
 
@@ -119,6 +127,7 @@ export function collectionConstructor(db: Connect) {
 		 * Count documents that meets the specified criteria
 		 */
 		public async count({ filter, limit }: { filter?: Filter<Schema>; limit?: number }) {
+			filter = fixDeep(filter || {});
 			return await (await this._collection()).count(filter || {}, { limit });
 		}
 
@@ -129,9 +138,10 @@ export function collectionConstructor(db: Connect) {
 			key,
 			filter
 		}: {
-			key: keys<Schema>;
+			key: Keys<Schema>;
 			filter?: Filter<Schema>;
 		}): Promise<Type[]> {
+			filter = fixDeep(filter || {});
 			return await (await this._collection()).distinct(key, filter || {});
 		}
 
@@ -152,7 +162,7 @@ export function collectionConstructor(db: Connect) {
 			background,
 			dropDups
 		}: {
-			key: keys<Schema> | keys<Schema>[];
+			key: Keys<Schema> | Keys<Schema>[];
 			unique?: boolean;
 			sparse?: boolean;
 			background?: boolean;
@@ -182,4 +192,10 @@ export function collectionConstructor(db: Connect) {
 		removeOne = this.deleteOne;
 		removeMany = this.deleteMany;
 	};
+}
+
+function fixDeep<T extends { $deep?: any }>(input: T): T {
+	const result = Object.assign<T, Filter<any>>(input, input.$deep);
+	delete result.$deep;
+	return result;
 }

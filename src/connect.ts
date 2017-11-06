@@ -8,8 +8,10 @@ import {
 	Collection,
 	InsertOneWriteOpResult
 } from 'mongodb';
+
 import { collectionConstructor } from './collection';
-import * as Interfaces from './interfaces';
+
+import { FieldLevelQueryOperators, UpdateOperators, TopLevelQueryOperators, ConnectionParams } from './interfaces';
 
 export class Connect {
 	private url: string;
@@ -17,7 +19,7 @@ export class Connect {
 
 	private _database: Db;
 
-	constructor({ url, options }: Interfaces.ConnectionParams) {
+	constructor({ url, options }: ConnectionParams) {
 		this.url = url;
 		this.options = options || {};
 

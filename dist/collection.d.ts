@@ -1,6 +1,6 @@
 import { Connect } from './connect';
 import { InsertWriteOpResult, UpdateWriteOpResult, DeleteWriteOpResultObject, Collection, InsertOneWriteOpResult } from 'mongodb';
-import { UpdateOperators, Filter, FieldLevelOperators, TopLevelOperators } from './interfaces';
+import { UpdateOperators, Filter } from './interfaces';
 export declare function collectionConstructor(db: Connect): {
     new <Schema>(collection: string): {
         _collectionName: string;
@@ -12,9 +12,7 @@ export declare function collectionConstructor(db: Connect): {
             documents: Schema[];
         }): Promise<InsertWriteOpResult>;
         read({filter, skip, limit, sort}: {
-            filter?: {} | {
-                [key in keyof Schema]: FieldLevelOperators;
-            } | TopLevelOperators<Schema> | undefined;
+            filter?: Filter<Schema> | undefined;
             skip?: number | undefined;
             limit?: number | undefined;
             sort?: {
@@ -42,16 +40,12 @@ export declare function collectionConstructor(db: Connect): {
             filter: Filter<Schema>;
         }): Promise<DeleteWriteOpResultObject>;
         count({filter, limit}: {
-            filter?: {} | {
-                [key in keyof Schema]: FieldLevelOperators;
-            } | TopLevelOperators<Schema> | undefined;
+            filter?: Filter<Schema> | undefined;
             limit?: number | undefined;
         }): Promise<number>;
         readDistinct<Type>({key, filter}: {
             key: keyof Schema;
-            filter?: {} | {
-                [key in keyof Schema]: FieldLevelOperators;
-            } | TopLevelOperators<Schema> | undefined;
+            filter?: Filter<Schema> | undefined;
         }): Promise<Type[]>;
         drop({name}: {
             name: string;
@@ -68,9 +62,7 @@ export declare function collectionConstructor(db: Connect): {
             dropTarget: boolean;
         }): Promise<void>;
         find: ({filter, skip, limit, sort}: {
-            filter?: {} | {
-                [key in keyof Schema]: FieldLevelOperators;
-            } | TopLevelOperators<Schema> | undefined;
+            filter?: Filter<Schema> | undefined;
             skip?: number | undefined;
             limit?: number | undefined;
             sort?: {
@@ -89,9 +81,7 @@ export declare function collectionConstructor(db: Connect): {
         }) => Promise<InsertWriteOpResult>;
         distinct: <Type>({key, filter}: {
             key: keyof Schema;
-            filter?: {} | {
-                [key in keyof Schema]: FieldLevelOperators;
-            } | TopLevelOperators<Schema> | undefined;
+            filter?: Filter<Schema> | undefined;
         }) => Promise<Type[]>;
         removeOne: ({filter}: {
             filter: Filter<Schema>;
