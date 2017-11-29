@@ -14,9 +14,7 @@
 	"author": "Alex Corvi",
 	"license": "MIT",
 	"dependencies": {
-		"mongodb": "^2.2.33"
-	},
-	"devDependencies": {
+		"mongodb": "^2.2.33",
 		"@types/mongodb": "^2.2.15"
 	},
 	"types": "./dist/index.d.ts"
