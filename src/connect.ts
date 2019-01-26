@@ -7,34 +7,44 @@ import {
 	DeleteWriteOpResultObject,
 	Collection,
 	InsertOneWriteOpResult
-} from 'mongodb';
+} from "mongodb";
 
-import { collectionConstructor } from './collection';
+import { collectionConstructor } from "./collection";
 
-import { FieldLevelQueryOperators, UpdateOperators, TopLevelQueryOperators, ConnectionParams } from './interfaces';
+import {
+	FieldLevelQueryOperators,
+	UpdateOperators,
+	TopLevelQueryOperators,
+	ConnectionParams
+} from "./interfaces";
 
 export class Connect {
 	private url: string;
+	private db: string;
 	private options: MongoClientOptions;
 
-	private _database: Db;
+	private _database: Db | undefined = undefined;
 
-	constructor({ url, options }: ConnectionParams) {
+	constructor({ url, db, options }: ConnectionParams) {
 		this.url = url;
 		this.options = options || {};
-
+		this.db = db;
 		this._connect();
 	}
 
 	private _connect() {
 		return new Promise<Db>((resolve, reject) => {
-			connect(this.url, this.options, (error, database) => {
-				if (error) {
-					reject(error);
+			connect(
+				this.url,
+				Object.assign(this.options, { useNewUrlParser: true }),
+				(error, client) => {
+					if (error) {
+						reject(error);
+					}
+					this._database = client.db(this.db);
+					resolve(this._database);
 				}
-				this._database = database;
-				resolve(database);
-			});
+			);
 		});
 	}
 
@@ -43,6 +53,8 @@ export class Connect {
 	}
 
 	public database() {
-		return this._database ? new Promise<Db>((resolve) => resolve(this._database)) : this._connect();
+		return this._database
+			? new Promise<Db>(resolve => resolve(this._database))
+			: this._connect();
 	}
 }

@@ -1,4 +1,4 @@
-import { Keys, Partial } from './common';
+import { Keys, Partial } from "./common";
 
 export interface FieldLevelQueryOperators<Value> {
 	/**
@@ -14,7 +14,7 @@ export interface FieldLevelQueryOperators<Value> {
 	$gt?: Value;
 
 	/**
-	 * $gte selects the documents where the value of the field is greater than or equal to (i.e. >=) a specified value 
+	 * $gte selects the documents where the value of the field is greater than or equal to (i.e. >=) a specified value
 	 * {field: {$gte:value}}
 	 */
 	$gte?: Value;
@@ -59,7 +59,7 @@ export interface FieldLevelQueryOperators<Value> {
 	 * When <boolean> is true, $exists matches the documents that contain the field, including documents where the field value is null. If <boolean> is false, the query returns only the documents that do not contain the field.
 	 * { field: { $exists: <boolean> } }
 	 */
-	$exist?: boolean;
+	$exists?: boolean;
 
 	/**
 	 * Select documents where the value of a field divided by a divisor has the specified remainder (i.e. perform a modulo operation to select documents). To specify a $mod expression, use the following syntax:
@@ -112,7 +112,7 @@ export interface TopLevelQueryOperators<Schema> {
 
 	/**
 	 * Use the $where operator to pass either a string containing a JavaScript function to the query system. The $where provides greater flexibility, but requires that the database processes the JavaScript expression or function for each document in the collection. Reference the document in the JavaScript expression or function using this.
-	*/
+	 */
 	$where?: (this: Schema) => boolean;
 
 	/**
@@ -125,6 +125,11 @@ export interface TopLevelQueryOperators<Schema> {
 }
 
 export type SchemaKeyFilters<Schema> = Partial<
-	{ [key in Keys<Schema>]: FieldLevelQueryOperators<Schema[key]> | Schema[key] }
+	{
+		[key in Keys<Schema>]:
+			| FieldLevelQueryOperators<Schema[key]>
+			| Schema[key]
+	}
 >;
-export type Filter<Schema> = SchemaKeyFilters<Schema> & TopLevelQueryOperators<Schema>;
+export type Filter<Schema> = SchemaKeyFilters<Schema> &
+	TopLevelQueryOperators<Schema>;

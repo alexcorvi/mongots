@@ -1,11 +1,11 @@
-import { Connect } from './connect';
+import { Connect } from "./connect";
 import {
 	InsertWriteOpResult,
 	UpdateWriteOpResult,
 	DeleteWriteOpResultObject,
 	Collection,
 	InsertOneWriteOpResult
-} from 'mongodb';
+} from "mongodb";
 
 import {
 	UpdateOperators,
@@ -14,9 +14,9 @@ import {
 	FieldLevelQueryOperators,
 	TopLevelQueryOperators,
 	Keys
-} from './interfaces';
+} from "./interfaces";
 
-import * as I from './interfaces';
+import * as I from "./interfaces";
 
 export function collectionConstructor(db: Connect) {
 	return class CollectionC<Schema> {
@@ -77,7 +77,13 @@ export function collectionConstructor(db: Connect) {
 		/**
 		 * Update many documents that meets the specified criteria
 		 */
-		public async updateMany({ filter, update }: { filter: Filter<Schema>; update: UpdateOperators<Schema> }) {
+		public async updateMany({
+			filter,
+			update
+		}: {
+			filter: Filter<Schema>;
+			update: UpdateOperators<Schema>;
+		}) {
 			filter = fixDeep(filter || {});
 			update = fix$Pull$eq(update);
 			return (await this._collection()).updateMany(filter, update);
@@ -86,7 +92,13 @@ export function collectionConstructor(db: Connect) {
 		/**
 		 * Update one document that meets the specified criteria
 		 */
-		public async updateOne({ filter, update }: { filter: Filter<Schema>; update: UpdateOperators<Schema> }) {
+		public async updateOne({
+			filter,
+			update
+		}: {
+			filter: Filter<Schema>;
+			update: UpdateOperators<Schema>;
+		}) {
 			filter = fixDeep(filter || {});
 			update = fix$Pull$eq(update);
 			return (await this._collection()).updateOne(filter, update);
@@ -105,7 +117,9 @@ export function collectionConstructor(db: Connect) {
 			upsert?: boolean;
 		}) {
 			filter = fixDeep(filter || {});
-			return (await this._collection()).updateOne(filter, document, { upsert });
+			return (await this._collection()).replaceOne(filter, document, {
+				upsert
+			});
 		}
 
 		/**
@@ -128,9 +142,20 @@ export function collectionConstructor(db: Connect) {
 		/**
 		 * Count documents that meets the specified criteria
 		 */
-		public async count({ filter, limit }: { filter?: Filter<Schema>; limit?: number }) {
+		public async count({
+			filter,
+			limit
+		}: {
+			filter?: Filter<Schema>;
+			limit?: number;
+		}) {
 			filter = fixDeep(filter || {});
-			return await (await this._collection()).count(filter || {}, { limit });
+			return await (await this._collection()).countDocuments(
+				filter || {},
+				{
+					limit
+				}
+			);
 		}
 
 		/**
@@ -144,14 +169,19 @@ export function collectionConstructor(db: Connect) {
 			filter?: Filter<Schema>;
 		}): Promise<Type[]> {
 			filter = fixDeep(filter || {});
-			return await (await this._collection()).distinct(key, filter || {});
+			return await (await this._collection()).distinct(
+				key.toString(),
+				filter || {}
+			);
 		}
 
 		/**
 		 * Drops the collection totally, must pass the collection name, just to make sure you know what you're doing
 		 */
 		public async drop({ name }: { name: string }): Promise<void> {
-			return name === this._collectionName ? await (await this._collection()).drop() : undefined;
+			return name === this._collectionName
+				? await (await this._collection()).drop()
+				: undefined;
 		}
 
 		/**
@@ -170,21 +200,34 @@ export function collectionConstructor(db: Connect) {
 			background?: boolean;
 			dropDups?: boolean;
 		}) {
-			return await (await this._collection()).createIndex(key, { unique, sparse, background, dropDups });
+			return await (await this._collection()).createIndex(key, {
+				unique,
+				sparse,
+				background,
+				dropDups
+			});
 		}
 
 		/**
 		 * Renames the collection
 		 */
-		public async rename({ newName, dropTarget }: { newName: string; dropTarget: boolean }): Promise<void> {
-			const r = await (await this._collection()).rename(newName, { dropTarget });
+		public async rename({
+			newName,
+			dropTarget
+		}: {
+			newName: string;
+			dropTarget: boolean;
+		}): Promise<void> {
+			const r = await (await this._collection()).rename(newName, {
+				dropTarget
+			});
 			this._collectionName = newName;
 			return;
 		}
 
 		/**
 		 * Aliases
-		 * 
+		 *
 		 */
 		find = this.read;
 		insert = this.createOne;
