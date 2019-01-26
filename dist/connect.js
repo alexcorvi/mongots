@@ -4,6 +4,7 @@ const mongodb_1 = require("mongodb");
 const collection_1 = require("./collection");
 class Connect {
     constructor({ url, options }) {
+        this._database = undefined;
         this.url = url;
         this.options = options || {};
         this._connect();
@@ -23,7 +24,9 @@ class Connect {
         return collection_1.collectionConstructor(this);
     }
     database() {
-        return this._database ? new Promise((resolve) => resolve(this._database)) : this._connect();
+        return this._database
+            ? new Promise(resolve => resolve(this._database))
+            : this._connect();
     }
 }
 exports.Connect = Connect;

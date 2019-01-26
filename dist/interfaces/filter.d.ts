@@ -1,4 +1,4 @@
-import { Keys, Partial } from './common';
+import { Keys, Partial } from "./common";
 export interface FieldLevelQueryOperators<Value> {
     /**
      * Specifies equality condition. The $eq operator matches documents where the value of a field equals the specified value.
@@ -49,7 +49,7 @@ export interface FieldLevelQueryOperators<Value> {
      * When <boolean> is true, $exists matches the documents that contain the field, including documents where the field value is null. If <boolean> is false, the query returns only the documents that do not contain the field.
      * { field: { $exists: <boolean> } }
      */
-    $exist?: boolean;
+    $exists?: boolean;
     /**
      * Select documents where the value of a field divided by a divisor has the specified remainder (i.e. perform a modulo operation to select documents). To specify a $mod expression, use the following syntax:
      * { field: { $mod: [ divisor, remainder ] } }
@@ -93,7 +93,7 @@ export interface TopLevelQueryOperators<Schema> {
     $or?: SchemaKeyFilters<Schema>[];
     /**
      * Use the $where operator to pass either a string containing a JavaScript function to the query system. The $where provides greater flexibility, but requires that the database processes the JavaScript expression or function for each document in the collection. Reference the document in the JavaScript expression or function using this.
-    */
+     */
     $where?: (this: Schema) => boolean;
     /**
      * Use this operator when trying to apply filter on a deeply nested properties, like: "employee.address.street".

@@ -1,17 +1,26 @@
-import { Connect } from './connect';
-import { InsertWriteOpResult, UpdateWriteOpResult, DeleteWriteOpResultObject, Collection, InsertOneWriteOpResult } from 'mongodb';
-import { UpdateOperators, Filter } from './interfaces';
+import { Connect } from "./connect";
+import { InsertWriteOpResult, UpdateWriteOpResult, DeleteWriteOpResultObject, Collection, InsertOneWriteOpResult } from "mongodb";
+import { UpdateOperators, Filter } from "./interfaces";
 export declare function collectionConstructor(db: Connect): {
     new <Schema>(collection: string): {
         _collectionName: string;
         _collection(): Promise<Collection<any>>;
-        createOne({document}: {
+        /**
+         * Put one document
+         */
+        createOne({ document }: {
             document: Schema;
         }): Promise<InsertOneWriteOpResult>;
-        createMany({documents}: {
+        /**
+         * Put multiple documents
+         */
+        createMany({ documents }: {
             documents: Schema[];
         }): Promise<InsertWriteOpResult>;
-        read({filter, skip, limit, sort}: {
+        /**
+         * Find documents that meets a specified criteria
+         */
+        read({ filter, skip, limit, sort }: {
             filter?: Filter<Schema> | undefined;
             skip?: number | undefined;
             limit?: number | undefined;
@@ -20,48 +29,83 @@ export declare function collectionConstructor(db: Connect): {
                 direction: number;
             } | undefined;
         }): Promise<Schema[]>;
-        updateMany({filter, update}: {
+        /**
+         * Update many documents that meets the specified criteria
+         */
+        updateMany({ filter, update }: {
             filter: Filter<Schema>;
             update: UpdateOperators<Schema>;
         }): Promise<UpdateWriteOpResult>;
-        updateOne({filter, update}: {
+        /**
+         * Update one document that meets the specified criteria
+         */
+        updateOne({ filter, update }: {
             filter: Filter<Schema>;
             update: UpdateOperators<Schema>;
         }): Promise<UpdateWriteOpResult>;
-        replaceOne({filter, document, upsert}: {
+        /**
+         * Replaces one document that meets the specified criteria
+         */
+        replaceOne({ filter, document, upsert }: {
             filter: Filter<Schema>;
             document: Schema;
             upsert?: boolean | undefined;
         }): Promise<UpdateWriteOpResult>;
-        deleteMany({filter}: {
+        /**
+         * Delete many documents that meets the specified criteria
+         *
+         */
+        deleteMany({ filter }: {
             filter: Filter<Schema>;
         }): Promise<DeleteWriteOpResultObject>;
-        deleteOne({filter}: {
+        /**
+         * Delete one document that meets the specified criteria
+         */
+        deleteOne({ filter }: {
             filter: Filter<Schema>;
         }): Promise<DeleteWriteOpResultObject>;
-        count({filter, limit}: {
+        /**
+         * Count documents that meets the specified criteria
+         */
+        count({ filter, limit }: {
             filter?: Filter<Schema> | undefined;
             limit?: number | undefined;
         }): Promise<number>;
-        readDistinct<Type>({key, filter}: {
+        /**
+         * Returns a list of distinct values for the given key across a collection.
+         */
+        readDistinct<Type>({ key, filter }: {
             key: keyof Schema;
             filter?: Filter<Schema> | undefined;
         }): Promise<Type[]>;
-        drop({name}: {
+        /**
+         * Drops the collection totally, must pass the collection name, just to make sure you know what you're doing
+         */
+        drop({ name }: {
             name: string;
         }): Promise<void>;
-        createIndex({key, unique, sparse, background, dropDups}: {
-            key: (keyof Schema) | (keyof Schema)[];
+        /**
+         * Creates an index on the db and collection.
+         */
+        createIndex({ key, unique, sparse, background, dropDups }: {
+            key: keyof Schema | (keyof Schema)[];
             unique?: boolean | undefined;
             sparse?: boolean | undefined;
             background?: boolean | undefined;
             dropDups?: boolean | undefined;
         }): Promise<string>;
-        rename({newName, dropTarget}: {
+        /**
+         * Renames the collection
+         */
+        rename({ newName, dropTarget }: {
             newName: string;
             dropTarget: boolean;
         }): Promise<void>;
-        find: ({filter, skip, limit, sort}: {
+        /**
+         * Aliases
+         *
+         */
+        find: ({ filter, skip, limit, sort }: {
             filter?: Filter<Schema> | undefined;
             skip?: number | undefined;
             limit?: number | undefined;
@@ -70,23 +114,23 @@ export declare function collectionConstructor(db: Connect): {
                 direction: number;
             } | undefined;
         }) => Promise<Schema[]>;
-        insert: ({document}: {
+        insert: ({ document }: {
             document: Schema;
         }) => Promise<InsertOneWriteOpResult>;
-        insertOne: ({document}: {
+        insertOne: ({ document }: {
             document: Schema;
         }) => Promise<InsertOneWriteOpResult>;
-        insertMany: ({documents}: {
+        insertMany: ({ documents }: {
             documents: Schema[];
         }) => Promise<InsertWriteOpResult>;
-        distinct: <Type>({key, filter}: {
+        distinct: <Type>({ key, filter }: {
             key: keyof Schema;
             filter?: Filter<Schema> | undefined;
         }) => Promise<Type[]>;
-        removeOne: ({filter}: {
+        removeOne: ({ filter }: {
             filter: Filter<Schema>;
         }) => Promise<DeleteWriteOpResultObject>;
-        removeMany: ({filter}: {
+        removeMany: ({ filter }: {
             filter: Filter<Schema>;
         }) => Promise<DeleteWriteOpResultObject>;
     };

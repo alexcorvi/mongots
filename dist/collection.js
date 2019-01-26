@@ -72,6 +72,7 @@ function collectionConstructor(db) {
         updateMany({ filter, update }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
+                update = fix$Pull$eq(update);
                 return (yield this._collection()).updateMany(filter, update);
             });
         }
@@ -81,6 +82,7 @@ function collectionConstructor(db) {
         updateOne({ filter, update }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
+                update = fix$Pull$eq(update);
                 return (yield this._collection()).updateOne(filter, update);
             });
         }
@@ -90,7 +92,9 @@ function collectionConstructor(db) {
         replaceOne({ filter, document, upsert }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
-                return (yield this._collection()).updateOne(filter, document, { upsert });
+                return (yield this._collection()).updateOne(filter, document, {
+                    upsert
+                });
             });
         }
         /**
@@ -118,7 +122,9 @@ function collectionConstructor(db) {
         count({ filter, limit }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
-                return yield (yield this._collection()).count(filter || {}, { limit });
+                return yield (yield this._collection()).count(filter || {}, {
+                    limit
+                });
             });
         }
         /**
@@ -127,7 +133,7 @@ function collectionConstructor(db) {
         readDistinct({ key, filter }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
-                return yield (yield this._collection()).distinct(key, filter || {});
+                return yield (yield this._collection()).distinct(key.toString(), filter || {});
             });
         }
         /**
@@ -135,7 +141,9 @@ function collectionConstructor(db) {
          */
         drop({ name }) {
             return __awaiter(this, void 0, void 0, function* () {
-                return name === this._collectionName ? yield (yield this._collection()).drop() : undefined;
+                return name === this._collectionName
+                    ? yield (yield this._collection()).drop()
+                    : undefined;
             });
         }
         /**
@@ -143,7 +151,12 @@ function collectionConstructor(db) {
          */
         createIndex({ key, unique, sparse, background, dropDups }) {
             return __awaiter(this, void 0, void 0, function* () {
-                return yield (yield this._collection()).createIndex(key, { unique, sparse, background, dropDups });
+                return yield (yield this._collection()).createIndex(key, {
+                    unique,
+                    sparse,
+                    background,
+                    dropDups
+                });
             });
         }
         /**
@@ -151,7 +164,9 @@ function collectionConstructor(db) {
          */
         rename({ newName, dropTarget }) {
             return __awaiter(this, void 0, void 0, function* () {
-                const r = yield (yield this._collection()).rename(newName, { dropTarget });
+                const r = yield (yield this._collection()).rename(newName, {
+                    dropTarget
+                });
                 this._collectionName = newName;
                 return;
             });
@@ -163,4 +178,14 @@ function fixDeep(input) {
     const result = Object.assign(input, input.$deep);
     delete result.$deep;
     return result;
+}
+function fix$Pull$eq(updateQuery) {
+    if (updateQuery.$pull) {
+        Object.keys(updateQuery.$pull).forEach(key => {
+            if (updateQuery.$pull[key].$eq) {
+                updateQuery.$pull[key] = updateQuery.$pull[key].$eq;
+            }
+        });
+    }
+    return updateQuery;
 }
