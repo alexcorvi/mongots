@@ -2,9 +2,10 @@ import { Db, InsertWriteOpResult, UpdateWriteOpResult, DeleteWriteOpResultObject
 import { UpdateOperators, ConnectionParams } from "./interfaces";
 export declare class Connect {
     private url;
+    private db;
     private options;
     private _database;
-    constructor({ url, options }: ConnectionParams);
+    constructor({ url, db, options }: ConnectionParams);
     private _connect;
     readonly collection: {
         new <Schema>(collection: string): {
@@ -37,7 +38,7 @@ export declare class Connect {
                 filter: import("./interfaces").Filter<Schema>;
                 document: Schema;
                 upsert?: boolean | undefined;
-            }): Promise<UpdateWriteOpResult>;
+            }): Promise<import("mongodb").ReplaceWriteOpResult>;
             deleteMany({ filter }: {
                 filter: import("./interfaces").Filter<Schema>;
             }): Promise<DeleteWriteOpResultObject>;

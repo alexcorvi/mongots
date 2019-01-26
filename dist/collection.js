@@ -92,7 +92,7 @@ function collectionConstructor(db) {
         replaceOne({ filter, document, upsert }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
-                return (yield this._collection()).updateOne(filter, document, {
+                return (yield this._collection()).replaceOne(filter, document, {
                     upsert
                 });
             });
@@ -122,7 +122,7 @@ function collectionConstructor(db) {
         count({ filter, limit }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
-                return yield (yield this._collection()).count(filter || {}, {
+                return yield (yield this._collection()).countDocuments(filter || {}, {
                     limit
                 });
             });

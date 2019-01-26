@@ -3,20 +3,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
 const collection_1 = require("./collection");
 class Connect {
-    constructor({ url, options }) {
+    constructor({ url, db, options }) {
         this._database = undefined;
         this.url = url;
         this.options = options || {};
+        this.db = db;
         this._connect();
     }
     _connect() {
         return new Promise((resolve, reject) => {
-            mongodb_1.connect(this.url, this.options, (error, database) => {
+            mongodb_1.connect(this.url, Object.assign(this.options, { useNewUrlParser: true }), (error, client) => {
                 if (error) {
                     reject(error);
                 }
-                this._database = database;
-                resolve(database);
+                this._database = client.db(this.db);
+                resolve(this._database);
             });
         });
     }

@@ -50,7 +50,7 @@ export declare function collectionConstructor(db: Connect): {
             filter: Filter<Schema>;
             document: Schema;
             upsert?: boolean | undefined;
-        }): Promise<UpdateWriteOpResult>;
+        }): Promise<import("mongodb").ReplaceWriteOpResult>;
         /**
          * Delete many documents that meets the specified criteria
          *
