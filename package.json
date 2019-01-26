@@ -10,12 +10,17 @@
 		"test": "ts-node ./test/test",
 		"prepublish": "npm run test && tsc"
 	},
-	"keywords": [ "mongodb", "mongo", "typescript", "ts" ],
+	"keywords": [
+		"mongodb",
+		"mongo",
+		"typescript",
+		"ts"
+	],
 	"author": "Alex Corvi",
 	"license": "MIT",
 	"dependencies": {
-		"mongodb": "^2.2.33",
-		"@types/mongodb": "^2.2.15"
+		"@types/mongodb": "^3.1.19",
+		"mongodb": "^3.1.13"
 	},
 	"types": "./dist/index.d.ts",
 	"devDependencies": {
