@@ -79,6 +79,7 @@ export function collectionConstructor(db: Connect) {
 		 */
 		public async updateMany({ filter, update }: { filter: Filter<Schema>; update: UpdateOperators<Schema> }) {
 			filter = fixDeep(filter || {});
+			update = fix$Pull$eq(update);
 			return (await this._collection()).updateMany(filter, update);
 		}
 
@@ -87,6 +88,7 @@ export function collectionConstructor(db: Connect) {
 		 */
 		public async updateOne({ filter, update }: { filter: Filter<Schema>; update: UpdateOperators<Schema> }) {
 			filter = fixDeep(filter || {});
+			update = fix$Pull$eq(update);
 			return (await this._collection()).updateOne(filter, update);
 		}
 
@@ -198,4 +200,23 @@ function fixDeep<T extends { $deep?: any }>(input: T): T {
 	const result = Object.assign<T, Filter<any>>(input, input.$deep);
 	delete result.$deep;
 	return result;
+}
+
+function fix$Pull$eq<S>(updateQuery: UpdateOperators<S>) {
+	if (updateQuery.$pull) {
+		Object.keys(updateQuery.$pull).forEach(key => {
+			if (
+				(updateQuery.$pull as {
+					[key: string]: FieldLevelQueryOperators<any>;
+				})[key].$eq
+			) {
+				(updateQuery.$pull as { [key: string]: any })[
+					key
+				] = (updateQuery.$pull as {
+					[key: string]: FieldLevelQueryOperators<any>;
+				})[key].$eq;
+			}
+		});
+	}
+	return updateQuery;
 }
