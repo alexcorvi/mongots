@@ -1,25 +1,23 @@
 import { Connect } from "./connect";
+import { UpsertOperators } from "./interfaces/update";
+import { Model } from "./model";
 import {
 	InsertWriteOpResult,
 	UpdateWriteOpResult,
 	DeleteWriteOpResultObject,
 	Collection,
-	InsertOneWriteOpResult
+	InsertOneWriteOpResult,
 } from "mongodb";
 
 import {
 	UpdateOperators,
-	UpdateOperatorsModifiers,
 	Filter,
-	FieldLevelQueryOperators,
 	TopLevelQueryOperators,
-	Keys
+	Keys,
 } from "./interfaces";
 
-import * as I from "./interfaces";
-
 export function collectionConstructor(db: Connect) {
-	return class CollectionC<Schema> {
+	return class CollectionC<S extends Model> {
 		public _collectionName: string;
 
 		constructor(collection: string) {
@@ -27,20 +25,20 @@ export function collectionConstructor(db: Connect) {
 		}
 
 		public async _collection() {
-			return (await db.database()).collection(this._collectionName);
+			return (await db.database()).collection<S>(this._collectionName);
 		}
 
 		/**
 		 * Put one document
 		 */
-		public async createOne({ document }: { document: Schema }) {
+		public async createOne({ document }: { document: S }) {
 			return (await this._collection()).insertOne(document);
 		}
 
 		/**
 		 * Put multiple documents
 		 */
-		public async createMany({ documents }: { documents: Schema[] }) {
+		public async createMany({ documents }: { documents: S[] }) {
 			return (await this._collection()).insertMany(documents);
 		}
 
@@ -51,15 +49,15 @@ export function collectionConstructor(db: Connect) {
 			filter,
 			skip,
 			limit,
-			sort = undefined
+			sort = undefined,
 		}: {
-			filter?: Filter<Schema>;
+			filter?: Filter<S>;
 			skip?: number;
 			limit?: number;
 			sort?: { key: string; direction: number };
 		}) {
 			filter = fixDeep(filter || {});
-			const cursor = (await this._collection()).find<Schema>(filter);
+			const cursor = (await this._collection()).find<S>(filter);
 			if (sort) {
 				const sortObj: any = {};
 				sortObj[sort.key] = sort.direction;
@@ -79,14 +77,20 @@ export function collectionConstructor(db: Connect) {
 		 */
 		public async updateMany({
 			filter,
-			update
+			update,
 		}: {
-			filter: Filter<Schema>;
-			update: UpdateOperators<Schema>;
+			filter: Filter<S>;
+			update: UpdateOperators<S>;
 		}) {
 			filter = fixDeep(filter || {});
+			if (update.$set) {
+				update.$set = fixDeep(update.$set);
+			}
+			if (update.$unset) {
+				update.$unset = fixDeep(update.$unset);
+			}
 			update = fix$Pull$eq(update);
-			return (await this._collection()).updateMany(filter, update);
+			return (await this._collection()).updateMany(filter, update as any);
 		}
 
 		/**
@@ -94,14 +98,20 @@ export function collectionConstructor(db: Connect) {
 		 */
 		public async updateOne({
 			filter,
-			update
+			update,
 		}: {
-			filter: Filter<Schema>;
-			update: UpdateOperators<Schema>;
+			filter: Filter<S>;
+			update: UpdateOperators<S>;
 		}) {
 			filter = fixDeep(filter || {});
 			update = fix$Pull$eq(update);
-			return (await this._collection()).updateOne(filter, update);
+			if (update.$set) {
+				update.$set = fixDeep(update.$set);
+			}
+			if (update.$unset) {
+				update.$unset = fixDeep(update.$unset);
+			}
+			return (await this._collection()).updateOne(filter, update as any);
 		}
 
 		/**
@@ -110,23 +120,74 @@ export function collectionConstructor(db: Connect) {
 		public async replaceOne({
 			filter,
 			document,
-			upsert
+			upsert,
 		}: {
-			filter: Filter<Schema>;
-			document: Schema;
+			filter: Filter<S>;
+			document: S;
 			upsert?: boolean;
 		}) {
 			filter = fixDeep(filter || {});
+			delete document._id;
 			return (await this._collection()).replaceOne(filter, document, {
-				upsert
+				upsert,
 			});
+		}
+
+		/**
+		 * Update document(s) that meets the specified criteria,
+		 * and do an insertion if no documents are matched
+		 */
+		public async upsert({
+			filter,
+			update,
+			multi,
+		}: {
+			filter: Filter<S>;
+			update: UpsertOperators<S>;
+			multi?: boolean;
+		}) {
+			filter = fixDeep(filter || {});
+			if (update.$set) {
+				update.$set = fixDeep(update.$set);
+			}
+			if (update.$unset) {
+				update.$unset = fixDeep(update.$unset);
+			}
+			const updateOperators = Object.keys(update);
+			for (let index = 0; index < updateOperators.length; index++) {
+				const updateOperator = updateOperators[index];
+				if (updateOperator === "$setOnInsert") continue;
+				const fields = Object.keys((update as any)[updateOperator]);
+				for (let j = 0; j < fields.length; j++) {
+					const field = fields[j];
+					delete (update.$setOnInsert as any)[field];
+				}
+			}
+
+			if (multi) {
+				return (await this._collection()).updateMany(
+					filter,
+					update as any,
+					{
+						upsert: true,
+					}
+				);
+			} else {
+				return (await this._collection()).updateOne(
+					filter,
+					update as any,
+					{
+						upsert: true,
+					}
+				);
+			}
 		}
 
 		/**
 		 * Delete many documents that meets the specified criteria
 		 *
 		 */
-		public async deleteMany({ filter }: { filter: Filter<Schema> }) {
+		public async deleteMany({ filter }: { filter: Filter<S> }) {
 			filter = fixDeep(filter || {});
 			return (await this._collection()).deleteMany(filter);
 		}
@@ -134,7 +195,7 @@ export function collectionConstructor(db: Connect) {
 		/**
 		 * Delete one document that meets the specified criteria
 		 */
-		public async deleteOne({ filter }: { filter: Filter<Schema> }) {
+		public async deleteOne({ filter }: { filter: Filter<S> }) {
 			filter = fixDeep(filter || {});
 			return (await this._collection()).deleteOne(filter);
 		}
@@ -144,16 +205,16 @@ export function collectionConstructor(db: Connect) {
 		 */
 		public async count({
 			filter,
-			limit
+			limit,
 		}: {
-			filter?: Filter<Schema>;
+			filter?: Filter<S>;
 			limit?: number;
 		}) {
 			filter = fixDeep(filter || {});
 			return await (await this._collection()).countDocuments(
 				filter || {},
 				{
-					limit
+					limit,
 				}
 			);
 		}
@@ -161,13 +222,13 @@ export function collectionConstructor(db: Connect) {
 		/**
 		 * Returns a list of distinct values for the given key across a collection.
 		 */
-		public async readDistinct<Type>({
+		public async readDistinct<T = keyof S>({
 			key,
-			filter
+			filter,
 		}: {
-			key: Keys<Schema>;
-			filter?: Filter<Schema>;
-		}): Promise<Type[]> {
+			key: Keys<S>;
+			filter?: Filter<S>;
+		}): Promise<T[]> {
 			filter = fixDeep(filter || {});
 			return await (await this._collection()).distinct(
 				key.toString(),
@@ -192,9 +253,9 @@ export function collectionConstructor(db: Connect) {
 			unique,
 			sparse,
 			background,
-			dropDups
+			dropDups,
 		}: {
-			key: Keys<Schema> | Keys<Schema>[];
+			key: Keys<S> | Keys<S>[];
 			unique?: boolean;
 			sparse?: boolean;
 			background?: boolean;
@@ -204,7 +265,7 @@ export function collectionConstructor(db: Connect) {
 				unique,
 				sparse,
 				background,
-				dropDups
+				dropDups,
 			});
 		}
 
@@ -213,13 +274,13 @@ export function collectionConstructor(db: Connect) {
 		 */
 		public async rename({
 			newName,
-			dropTarget
+			dropTarget,
 		}: {
 			newName: string;
 			dropTarget: boolean;
 		}): Promise<void> {
 			const r = await (await this._collection()).rename(newName, {
-				dropTarget
+				dropTarget,
 			});
 			this._collectionName = newName;
 			return;
@@ -239,25 +300,17 @@ export function collectionConstructor(db: Connect) {
 	};
 }
 
-function fixDeep<T extends { $deep?: any }>(input: T): T {
+function fixDeep<T extends Filter<any>>(input: T): T {
 	const result = Object.assign<T, Filter<any>>(input, input.$deep);
 	delete result.$deep;
 	return result;
 }
 
-function fix$Pull$eq<S>(updateQuery: UpdateOperators<S>) {
+function fix$Pull$eq(updateQuery: any) {
 	if (updateQuery.$pull) {
-		Object.keys(updateQuery.$pull).forEach(key => {
-			if (
-				(updateQuery.$pull as {
-					[key: string]: FieldLevelQueryOperators<any>;
-				})[key].$eq
-			) {
-				(updateQuery.$pull as { [key: string]: any })[
-					key
-				] = (updateQuery.$pull as {
-					[key: string]: FieldLevelQueryOperators<any>;
-				})[key].$eq;
+		Object.keys(updateQuery.$pull).forEach((key) => {
+			if (updateQuery.$pull[key].$eq) {
+				updateQuery.$pull[key] = updateQuery.$pull[key].$eq;
 			}
 		});
 	}

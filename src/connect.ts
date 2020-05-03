@@ -1,60 +1,32 @@
-import {
-	Db,
-	MongoClientOptions,
-	connect,
-	InsertWriteOpResult,
-	UpdateWriteOpResult,
-	DeleteWriteOpResultObject,
-	Collection,
-	InsertOneWriteOpResult
-} from "mongodb";
-
 import { collectionConstructor } from "./collection";
-
-import {
-	FieldLevelQueryOperators,
-	UpdateOperators,
-	TopLevelQueryOperators,
-	ConnectionParams
-} from "./interfaces";
+import { ConnectionParams } from "./interfaces";
+import { connect, Db, MongoClientOptions } from "mongodb";
 
 export class Connect {
-	private url: string;
-	private db: string;
+	private connectionStr: string;
+	private dbName: string;
 	private options: MongoClientOptions;
 
 	private _database: Db | undefined = undefined;
 
 	constructor({ url, db, options }: ConnectionParams) {
-		this.url = url;
+		this.connectionStr = url;
 		this.options = options || {};
-		this.db = db;
-		this._connect();
+		this.dbName = db;
+		this.database();
 	}
 
-	private _connect() {
-		return new Promise<Db>((resolve, reject) => {
-			connect(
-				this.url,
-				Object.assign(this.options, { useNewUrlParser: true }),
-				(error, client) => {
-					if (error) {
-						reject(error);
-					}
-					this._database = client.db(this.db);
-					resolve(this._database);
-				}
-			);
-		});
+	async database() {
+		if (this._database) return this._database;
+		const client = await connect(
+			this.connectionStr,
+			Object.assign(this.options, { useNewUrlParser: true })
+		);
+		this._database = client.db(this.dbName);
+		return this._database;
 	}
 
-	get collection() {
+	get Collection() {
 		return collectionConstructor(this);
-	}
-
-	public database() {
-		return this._database
-			? new Promise<Db>(resolve => resolve(this._database))
-			: this._connect();
 	}
 }
