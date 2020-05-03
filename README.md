@@ -6,9 +6,9 @@
 
 An abstraction layer aimed for better API design and stronger type declarations for better experience with TypeScript and MongoDB.
 
-There **is** a types declaration file for MongoDB on the DefinitelyTyped repository, however, I'm not a fan of the native MongoDB driver API design, and the types declaration file doesn't support typing for the dollar sign operators (like: `$gt` and `$set`) and that is basically a side-effect of the API design.
+There **is** a types declaration file for MongoDB on the DefinitelyTyped repository, however the types declaration file doesn't support typing for the dollar sign operators (like: `$gt` and `$set`), which is basically where you need strong type declarations, and that is basically a side-effect of the query API design. This is why slight changes to the query API has been introduced here.
 
-This library can cover 90% of the use cases, with a more clean and robust API design and type declaration where ever possible. Even on methods that cannot have strong typing, I've hints that should be quite helpful since it comes with the documentation.
+This library can cover 90% of the use cases, with a more clean and robust API design and type declaration where ever possible (everywhere except in embedded documents).
 
 ## What this is not
 
@@ -24,10 +24,16 @@ This library can cover 90% of the use cases, with a more clean and robust API de
 npm i mongots --save
 ```
 
+or
+
+```
+yarn add mongots
+```
+
 ### Usage
 
 ```typescript
-import { Connect } from "mongots";
+import { Connect, Model } from "mongots";
 
 const connection = new Connect({
     // connect to your server through the URL:
@@ -46,11 +52,11 @@ const connection = new Connect({
 // but before that, let's define
 // a TypeScript interface for your collection schema
 
-interface Employee {
-    name: string;
-    email: string;
-    salary: number;
-    phoneNumbers: number[];
+class Employee extends Model {
+    name: string = ""; // define defaults
+    email: string = "";
+    salary: number = 0;
+    phoneNumbers: number[] = [];
 }
 
 const employees = new connection.collection<Employee>('employees');
