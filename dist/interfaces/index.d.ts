@@ -1,4 +1,4 @@
 export { Keys, Partial } from "./common";
+export { TopLevelQueryOperators, SchemaKeyFilters, Filter, SchemaKeySort, SchemaKeyProjection, } from "./filter";
+export { UpdateOperators, UpdateOperatorsOnSchema, UpsertOperators, } from "./update";
 export { ConnectionParams } from "./connection-params";
-export { FieldLevelQueryOperators, Filter, SchemaKeyFilters, TopLevelQueryOperators } from "./filter";
-export { UpdateOperators, UpdateOperatorsModifiers, UpdateOperatorsOnSchema } from "./update";

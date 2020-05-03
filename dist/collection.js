@@ -1,9 +1,10 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -48,7 +49,7 @@ function collectionConstructor(db) {
         /**
          * Find documents that meets a specified criteria
          */
-        read({ filter, skip, limit, sort = undefined }) {
+        read({ filter, skip, limit, sort = undefined, }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
                 const cursor = (yield this._collection()).find(filter);
@@ -69,9 +70,15 @@ function collectionConstructor(db) {
         /**
          * Update many documents that meets the specified criteria
          */
-        updateMany({ filter, update }) {
+        updateMany({ filter, update, }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
+                if (update.$set) {
+                    update.$set = fixDeep(update.$set);
+                }
+                if (update.$unset) {
+                    update.$unset = fixDeep(update.$unset);
+                }
                 update = fix$Pull$eq(update);
                 return (yield this._collection()).updateMany(filter, update);
             });
@@ -79,22 +86,65 @@ function collectionConstructor(db) {
         /**
          * Update one document that meets the specified criteria
          */
-        updateOne({ filter, update }) {
+        updateOne({ filter, update, }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
                 update = fix$Pull$eq(update);
+                if (update.$set) {
+                    update.$set = fixDeep(update.$set);
+                }
+                if (update.$unset) {
+                    update.$unset = fixDeep(update.$unset);
+                }
                 return (yield this._collection()).updateOne(filter, update);
             });
         }
         /**
          * Replaces one document that meets the specified criteria
          */
-        replaceOne({ filter, document, upsert }) {
+        replaceOne({ filter, document, upsert, }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
+                delete document._id;
                 return (yield this._collection()).replaceOne(filter, document, {
-                    upsert
+                    upsert,
                 });
+            });
+        }
+        /**
+         * Update document(s) that meets the specified criteria,
+         * and do an insertion if no documents are matched
+         */
+        upsert({ filter, update, multi, }) {
+            return __awaiter(this, void 0, void 0, function* () {
+                filter = fixDeep(filter || {});
+                if (update.$set) {
+                    update.$set = fixDeep(update.$set);
+                }
+                if (update.$unset) {
+                    update.$unset = fixDeep(update.$unset);
+                }
+                const updateOperators = Object.keys(update);
+                for (let index = 0; index < updateOperators.length; index++) {
+                    const updateOperator = updateOperators[index];
+                    if (updateOperator === "$setOnInsert")
+                        continue;
+                    const fields = Object.keys(update[updateOperator]);
+                    for (let j = 0; j < fields.length; j++) {
+                        const field = fields[j];
+                        delete update.$setOnInsert[field];
+                    }
+                }
+                if (multi) {
+                    return (yield this._collection()).updateMany(filter, update, {
+                        upsert: true,
+                    });
+                }
+                else {
+                    return (yield this._collection()).updateOne(filter, update, {
+                        upsert: true,
+                    });
+                }
             });
         }
         /**
@@ -119,18 +169,18 @@ function collectionConstructor(db) {
         /**
          * Count documents that meets the specified criteria
          */
-        count({ filter, limit }) {
+        count({ filter, limit, }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
                 return yield (yield this._collection()).countDocuments(filter || {}, {
-                    limit
+                    limit,
                 });
             });
         }
         /**
          * Returns a list of distinct values for the given key across a collection.
          */
-        readDistinct({ key, filter }) {
+        readDistinct({ key, filter, }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
                 return yield (yield this._collection()).distinct(key.toString(), filter || {});
@@ -149,23 +199,23 @@ function collectionConstructor(db) {
         /**
          * Creates an index on the db and collection.
          */
-        createIndex({ key, unique, sparse, background, dropDups }) {
+        createIndex({ key, unique, sparse, background, dropDups, }) {
             return __awaiter(this, void 0, void 0, function* () {
                 return yield (yield this._collection()).createIndex(key, {
                     unique,
                     sparse,
                     background,
-                    dropDups
+                    dropDups,
                 });
             });
         }
         /**
          * Renames the collection
          */
-        rename({ newName, dropTarget }) {
+        rename({ newName, dropTarget, }) {
             return __awaiter(this, void 0, void 0, function* () {
                 const r = yield (yield this._collection()).rename(newName, {
-                    dropTarget
+                    dropTarget,
                 });
                 this._collectionName = newName;
                 return;
@@ -181,7 +231,7 @@ function fixDeep(input) {
 }
 function fix$Pull$eq(updateQuery) {
     if (updateQuery.$pull) {
-        Object.keys(updateQuery.$pull).forEach(key => {
+        Object.keys(updateQuery.$pull).forEach((key) => {
             if (updateQuery.$pull[key].$eq) {
                 updateQuery.$pull[key] = updateQuery.$pull[key].$eq;
             }

@@ -1,83 +1,94 @@
 import { Connect } from "./connect";
+import { UpsertOperators } from "./interfaces/update";
+import { Model } from "./model";
 import { InsertWriteOpResult, UpdateWriteOpResult, DeleteWriteOpResultObject, Collection, InsertOneWriteOpResult } from "mongodb";
-import { UpdateOperators, Filter } from "./interfaces";
+import { UpdateOperators, Filter, TopLevelQueryOperators } from "./interfaces";
 export declare function collectionConstructor(db: Connect): {
-    new <Schema>(collection: string): {
+    new <S extends Model<any>>(collection: string): {
         _collectionName: string;
-        _collection(): Promise<Collection<any>>;
+        _collection(): Promise<Collection<S>>;
         /**
          * Put one document
          */
         createOne({ document }: {
-            document: Schema;
+            document: S;
         }): Promise<InsertOneWriteOpResult>;
         /**
          * Put multiple documents
          */
         createMany({ documents }: {
-            documents: Schema[];
+            documents: S[];
         }): Promise<InsertWriteOpResult>;
         /**
          * Find documents that meets a specified criteria
          */
-        read({ filter, skip, limit, sort }: {
-            filter?: Filter<Schema> | undefined;
+        read({ filter, skip, limit, sort, }: {
+            filter?: import("./interfaces").Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | TopLevelQueryOperators<S> | undefined;
             skip?: number | undefined;
             limit?: number | undefined;
             sort?: {
                 key: string;
                 direction: number;
             } | undefined;
-        }): Promise<Schema[]>;
+        }): Promise<S[]>;
         /**
          * Update many documents that meets the specified criteria
          */
-        updateMany({ filter, update }: {
-            filter: Filter<Schema>;
-            update: UpdateOperators<Schema>;
+        updateMany({ filter, update, }: {
+            filter: Filter<S>;
+            update: UpdateOperators<S>;
         }): Promise<UpdateWriteOpResult>;
         /**
          * Update one document that meets the specified criteria
          */
-        updateOne({ filter, update }: {
-            filter: Filter<Schema>;
-            update: UpdateOperators<Schema>;
+        updateOne({ filter, update, }: {
+            filter: Filter<S>;
+            update: UpdateOperators<S>;
         }): Promise<UpdateWriteOpResult>;
         /**
          * Replaces one document that meets the specified criteria
          */
-        replaceOne({ filter, document, upsert }: {
-            filter: Filter<Schema>;
-            document: Schema;
+        replaceOne({ filter, document, upsert, }: {
+            filter: Filter<S>;
+            document: S;
             upsert?: boolean | undefined;
         }): Promise<import("mongodb").ReplaceWriteOpResult>;
+        /**
+         * Update document(s) that meets the specified criteria,
+         * and do an insertion if no documents are matched
+         */
+        upsert({ filter, update, multi, }: {
+            filter: Filter<S>;
+            update: UpsertOperators<S>;
+            multi?: boolean | undefined;
+        }): Promise<UpdateWriteOpResult>;
         /**
          * Delete many documents that meets the specified criteria
          *
          */
         deleteMany({ filter }: {
-            filter: Filter<Schema>;
+            filter: Filter<S>;
         }): Promise<DeleteWriteOpResultObject>;
         /**
          * Delete one document that meets the specified criteria
          */
         deleteOne({ filter }: {
-            filter: Filter<Schema>;
+            filter: Filter<S>;
         }): Promise<DeleteWriteOpResultObject>;
         /**
          * Count documents that meets the specified criteria
          */
-        count({ filter, limit }: {
-            filter?: Filter<Schema> | undefined;
+        count({ filter, limit, }: {
+            filter?: import("./interfaces").Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | TopLevelQueryOperators<S> | undefined;
             limit?: number | undefined;
         }): Promise<number>;
         /**
          * Returns a list of distinct values for the given key across a collection.
          */
-        readDistinct<Type>({ key, filter }: {
-            key: keyof Schema;
-            filter?: Filter<Schema> | undefined;
-        }): Promise<Type[]>;
+        readDistinct<T = keyof S>({ key, filter, }: {
+            key: keyof S;
+            filter?: import("./interfaces").Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | TopLevelQueryOperators<S> | undefined;
+        }): Promise<T[]>;
         /**
          * Drops the collection totally, must pass the collection name, just to make sure you know what you're doing
          */
@@ -87,8 +98,8 @@ export declare function collectionConstructor(db: Connect): {
         /**
          * Creates an index on the db and collection.
          */
-        createIndex({ key, unique, sparse, background, dropDups }: {
-            key: keyof Schema | (keyof Schema)[];
+        createIndex({ key, unique, sparse, background, dropDups, }: {
+            key: keyof S | (keyof S)[];
             unique?: boolean | undefined;
             sparse?: boolean | undefined;
             background?: boolean | undefined;
@@ -97,7 +108,7 @@ export declare function collectionConstructor(db: Connect): {
         /**
          * Renames the collection
          */
-        rename({ newName, dropTarget }: {
+        rename({ newName, dropTarget, }: {
             newName: string;
             dropTarget: boolean;
         }): Promise<void>;
@@ -105,33 +116,33 @@ export declare function collectionConstructor(db: Connect): {
          * Aliases
          *
          */
-        find: ({ filter, skip, limit, sort }: {
-            filter?: Filter<Schema> | undefined;
+        find: ({ filter, skip, limit, sort, }: {
+            filter?: import("./interfaces").Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | TopLevelQueryOperators<S> | undefined;
             skip?: number | undefined;
             limit?: number | undefined;
             sort?: {
                 key: string;
                 direction: number;
             } | undefined;
-        }) => Promise<Schema[]>;
+        }) => Promise<S[]>;
         insert: ({ document }: {
-            document: Schema;
+            document: S;
         }) => Promise<InsertOneWriteOpResult>;
         insertOne: ({ document }: {
-            document: Schema;
+            document: S;
         }) => Promise<InsertOneWriteOpResult>;
         insertMany: ({ documents }: {
-            documents: Schema[];
+            documents: S[];
         }) => Promise<InsertWriteOpResult>;
-        distinct: <Type>({ key, filter }: {
-            key: keyof Schema;
-            filter?: Filter<Schema> | undefined;
-        }) => Promise<Type[]>;
+        distinct: <T = keyof S>({ key, filter, }: {
+            key: keyof S;
+            filter?: import("./interfaces").Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | TopLevelQueryOperators<S> | undefined;
+        }) => Promise<T[]>;
         removeOne: ({ filter }: {
-            filter: Filter<Schema>;
+            filter: Filter<S>;
         }) => Promise<DeleteWriteOpResultObject>;
         removeMany: ({ filter }: {
-            filter: Filter<Schema>;
+            filter: Filter<S>;
         }) => Promise<DeleteWriteOpResultObject>;
     };
 };
