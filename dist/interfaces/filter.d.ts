@@ -1,4 +1,4 @@
-import { Keys, Partial } from "./common";
+import { Keys } from "./common";
 export interface AnyFieldOperators<V> {
     $type?: "string" | "number" | "boolean" | "undefined" | "array" | "null" | "date" | "object";
     /**

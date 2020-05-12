@@ -7,7 +7,7 @@ export declare class Connect {
     private _database;
     constructor({ url, db, options }: ConnectionParams);
     database(): Promise<Db>;
-    get Collection(): {
+    readonly Collection: {
         new <S extends import("./model").Model<any>>(collection: string): {
             _collectionName: string;
             _collection(): Promise<import("mongodb").Collection<S>>;
@@ -18,7 +18,7 @@ export declare class Connect {
                 documents: S[];
             }): Promise<import("mongodb").InsertWriteOpResult>;
             read({ filter, skip, limit, sort, }: {
-                filter?: import("./interfaces").Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
+                filter?: Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
                 skip?: number | undefined;
                 limit?: number | undefined;
                 sort?: {
@@ -27,36 +27,36 @@ export declare class Connect {
                 } | undefined;
             }): Promise<S[]>;
             updateMany({ filter, update, }: {
-                filter: import("./interfaces").Filter<S>;
-                update: import("./interfaces").UpdateOperators<S>;
+                filter: import("./collection").Filter<S>;
+                update: import("./collection").UpdateOperators<S>;
             }): Promise<import("mongodb").UpdateWriteOpResult>;
             updateOne({ filter, update, }: {
-                filter: import("./interfaces").Filter<S>;
-                update: import("./interfaces").UpdateOperators<S>;
+                filter: import("./collection").Filter<S>;
+                update: import("./collection").UpdateOperators<S>;
             }): Promise<import("mongodb").UpdateWriteOpResult>;
             replaceOne({ filter, document, upsert, }: {
-                filter: import("./interfaces").Filter<S>;
+                filter: import("./collection").Filter<S>;
                 document: S;
                 upsert?: boolean | undefined;
             }): Promise<import("mongodb").ReplaceWriteOpResult>;
             upsert({ filter, update, multi, }: {
-                filter: import("./interfaces").Filter<S>;
-                update: import("./interfaces").UpsertOperators<S>;
+                filter: import("./collection").Filter<S>;
+                update: import("./collection").UpsertOperators<S>;
                 multi?: boolean | undefined;
             }): Promise<import("mongodb").UpdateWriteOpResult>;
             deleteMany({ filter }: {
-                filter: import("./interfaces").Filter<S>;
+                filter: import("./collection").Filter<S>;
             }): Promise<import("mongodb").DeleteWriteOpResultObject>;
             deleteOne({ filter }: {
-                filter: import("./interfaces").Filter<S>;
+                filter: import("./collection").Filter<S>;
             }): Promise<import("mongodb").DeleteWriteOpResultObject>;
             count({ filter, limit, }: {
-                filter?: import("./interfaces").Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
+                filter?: Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
                 limit?: number | undefined;
             }): Promise<number>;
             readDistinct<T = keyof S>({ key, filter, }: {
                 key: keyof S;
-                filter?: import("./interfaces").Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
+                filter?: Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
             }): Promise<T[]>;
             drop({ name }: {
                 name: string;
@@ -68,12 +68,15 @@ export declare class Connect {
                 background?: boolean | undefined;
                 dropDups?: boolean | undefined;
             }): Promise<string>;
+            removeIndex({ key }: {
+                key: keyof S | (keyof S)[];
+            }): Promise<any>;
             rename({ newName, dropTarget, }: {
                 newName: string;
                 dropTarget: boolean;
             }): Promise<void>;
             find: ({ filter, skip, limit, sort, }: {
-                filter?: import("./interfaces").Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
+                filter?: Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
                 skip?: number | undefined;
                 limit?: number | undefined;
                 sort?: {
@@ -92,13 +95,13 @@ export declare class Connect {
             }) => Promise<import("mongodb").InsertWriteOpResult>;
             distinct: <T = keyof S>({ key, filter, }: {
                 key: keyof S;
-                filter?: import("./interfaces").Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
+                filter?: Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
             }) => Promise<T[]>;
             removeOne: ({ filter }: {
-                filter: import("./interfaces").Filter<S>;
+                filter: import("./collection").Filter<S>;
             }) => Promise<import("mongodb").DeleteWriteOpResultObject>;
             removeMany: ({ filter }: {
-                filter: import("./interfaces").Filter<S>;
+                filter: import("./collection").Filter<S>;
             }) => Promise<import("mongodb").DeleteWriteOpResultObject>;
         };
     };
