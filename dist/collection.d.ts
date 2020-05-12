@@ -5,19 +5,25 @@ import * as MongoDB from "mongodb";
 export declare function collectionConstructor(db: Connect): {
     new <S extends Model<any>>(collection: string): {
         _collectionName: string;
-        _collection(): Promise<MongoDB.Collection<S>>;
+        _collection(): Promise<MongoDB.Collection<any>>;
         /**
          * Put one document
          */
         createOne({ document }: {
             document: S;
-        }): Promise<MongoDB.InsertOneWriteOpResult>;
+        }): Promise<{
+            ok: number;
+            n: number;
+        }>;
         /**
          * Put multiple documents
          */
         createMany({ documents }: {
             documents: S[];
-        }): Promise<MongoDB.InsertWriteOpResult>;
+        }): Promise<{
+            ok: number;
+            n: number;
+        }>;
         /**
          * Find documents that meets a specified criteria
          */
@@ -36,14 +42,22 @@ export declare function collectionConstructor(db: Connect): {
         updateMany({ filter, update, }: {
             filter: Filter<S>;
             update: UpdateOperators<S>;
-        }): Promise<MongoDB.UpdateWriteOpResult>;
+        }): Promise<{
+            ok: number;
+            n: number;
+            nModified: number;
+        }>;
         /**
          * Update one document that meets the specified criteria
          */
         updateOne({ filter, update, }: {
             filter: Filter<S>;
             update: UpdateOperators<S>;
-        }): Promise<MongoDB.UpdateWriteOpResult>;
+        }): Promise<{
+            ok: number;
+            n: number;
+            nModified: number;
+        }>;
         /**
          * Replaces one document that meets the specified criteria
          */
@@ -51,7 +65,11 @@ export declare function collectionConstructor(db: Connect): {
             filter: Filter<S>;
             document: S;
             upsert?: boolean | undefined;
-        }): Promise<MongoDB.ReplaceWriteOpResult>;
+        }): Promise<{
+            ok: number;
+            n: number;
+            nModified: number;
+        }>;
         /**
          * Update document(s) that meets the specified criteria,
          * and do an insertion if no documents are matched
@@ -60,20 +78,30 @@ export declare function collectionConstructor(db: Connect): {
             filter: Filter<S>;
             update: UpsertOperators<S>;
             multi?: boolean | undefined;
-        }): Promise<MongoDB.UpdateWriteOpResult>;
+        }): Promise<{
+            ok: number;
+            n: number;
+            nModified: number;
+        }>;
         /**
          * Delete many documents that meets the specified criteria
          *
          */
         deleteMany({ filter }: {
             filter: Filter<S>;
-        }): Promise<MongoDB.DeleteWriteOpResultObject>;
+        }): Promise<{
+            ok?: number | undefined;
+            n?: number | undefined;
+        }>;
         /**
          * Delete one document that meets the specified criteria
          */
         deleteOne({ filter }: {
             filter: Filter<S>;
-        }): Promise<MongoDB.DeleteWriteOpResultObject>;
+        }): Promise<{
+            ok?: number | undefined;
+            n?: number | undefined;
+        }>;
         /**
          * Count documents that meets the specified criteria
          */
@@ -132,23 +160,38 @@ export declare function collectionConstructor(db: Connect): {
         }) => Promise<S[]>;
         insert: ({ document }: {
             document: S;
-        }) => Promise<MongoDB.InsertOneWriteOpResult>;
+        }) => Promise<{
+            ok: number;
+            n: number;
+        }>;
         insertOne: ({ document }: {
             document: S;
-        }) => Promise<MongoDB.InsertOneWriteOpResult>;
+        }) => Promise<{
+            ok: number;
+            n: number;
+        }>;
         insertMany: ({ documents }: {
             documents: S[];
-        }) => Promise<MongoDB.InsertWriteOpResult>;
+        }) => Promise<{
+            ok: number;
+            n: number;
+        }>;
         distinct: <T = keyof S>({ key, filter, }: {
             key: keyof S;
             filter?: Partial<{ [key in keyof S]: S[key] | import("./interfaces/filter").FieldLevelQueryOperators<S[key]>; }> | import("./interfaces").TopLevelQueryOperators<S> | undefined;
         }) => Promise<T[]>;
         removeOne: ({ filter }: {
             filter: Filter<S>;
-        }) => Promise<MongoDB.DeleteWriteOpResultObject>;
+        }) => Promise<{
+            ok?: number | undefined;
+            n?: number | undefined;
+        }>;
         removeMany: ({ filter }: {
             filter: Filter<S>;
-        }) => Promise<MongoDB.DeleteWriteOpResultObject>;
+        }) => Promise<{
+            ok?: number | undefined;
+            n?: number | undefined;
+        }>;
     };
 };
 export { MongoDB, Connect, Filter, Keys, UpdateOperators, UpsertOperators, Model, };

@@ -47,7 +47,8 @@ function collectionConstructor(db) {
          */
         createOne({ document }) {
             return __awaiter(this, void 0, void 0, function* () {
-                return (yield this._collection()).insertOne(document);
+                return (yield (yield this._collection()).insertOne(document))
+                    .result;
             });
         }
         /**
@@ -55,7 +56,8 @@ function collectionConstructor(db) {
          */
         createMany({ documents }) {
             return __awaiter(this, void 0, void 0, function* () {
-                return (yield this._collection()).insertMany(documents);
+                return (yield (yield this._collection()).insertMany(documents))
+                    .result;
             });
         }
         /**
@@ -92,7 +94,8 @@ function collectionConstructor(db) {
                     update.$unset = fixDeep(update.$unset);
                 }
                 update = fix$Pull$eq(update);
-                return (yield this._collection()).updateMany(filter, update);
+                return (yield (yield this._collection()).updateMany(filter, update))
+                    .result;
             });
         }
         /**
@@ -108,7 +111,8 @@ function collectionConstructor(db) {
                 if (update.$unset) {
                     update.$unset = fixDeep(update.$unset);
                 }
-                return (yield this._collection()).updateOne(filter, update);
+                return (yield (yield this._collection()).updateOne(filter, update))
+                    .result;
             });
         }
         /**
@@ -118,9 +122,9 @@ function collectionConstructor(db) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
                 delete document._id;
-                return (yield this._collection()).replaceOne(filter, document, {
+                return (yield (yield this._collection()).replaceOne(filter, document, {
                     upsert,
-                });
+                })).result;
             });
         }
         /**
@@ -148,14 +152,14 @@ function collectionConstructor(db) {
                     }
                 }
                 if (multi) {
-                    return (yield this._collection()).updateMany(filter, update, {
+                    return (yield (yield this._collection()).updateMany(filter, update, {
                         upsert: true,
-                    });
+                    })).result;
                 }
                 else {
-                    return (yield this._collection()).updateOne(filter, update, {
+                    return (yield (yield this._collection()).updateOne(filter, update, {
                         upsert: true,
-                    });
+                    })).result;
                 }
             });
         }
@@ -166,7 +170,7 @@ function collectionConstructor(db) {
         deleteMany({ filter }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
-                return (yield this._collection()).deleteMany(filter);
+                return (yield (yield this._collection()).deleteMany(filter)).result;
             });
         }
         /**
@@ -175,7 +179,7 @@ function collectionConstructor(db) {
         deleteOne({ filter }) {
             return __awaiter(this, void 0, void 0, function* () {
                 filter = fixDeep(filter || {});
-                return (yield this._collection()).deleteOne(filter);
+                return (yield (yield this._collection()).deleteOne(filter)).result;
             });
         }
         /**
