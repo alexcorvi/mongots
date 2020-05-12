@@ -12,21 +12,23 @@ export function collectionConstructor(db: Connect) {
 		}
 
 		public async _collection() {
-			return (await db.database()).collection<S>(this._collectionName);
+			return (await db.database()).collection<any>(this._collectionName);
 		}
 
 		/**
 		 * Put one document
 		 */
 		public async createOne({ document }: { document: S }) {
-			return (await this._collection()).insertOne(document);
+			return (await (await this._collection()).insertOne(document))
+				.result;
 		}
 
 		/**
 		 * Put multiple documents
 		 */
 		public async createMany({ documents }: { documents: S[] }) {
-			return (await this._collection()).insertMany(documents);
+			return (await (await this._collection()).insertMany(documents))
+				.result;
 		}
 
 		/**
@@ -77,7 +79,8 @@ export function collectionConstructor(db: Connect) {
 				update.$unset = fixDeep(update.$unset);
 			}
 			update = fix$Pull$eq(update);
-			return (await this._collection()).updateMany(filter, update as any);
+			return (await (await this._collection()).updateMany(filter, update))
+				.result;
 		}
 
 		/**
@@ -98,7 +101,8 @@ export function collectionConstructor(db: Connect) {
 			if (update.$unset) {
 				update.$unset = fixDeep(update.$unset);
 			}
-			return (await this._collection()).updateOne(filter, update as any);
+			return (await (await this._collection()).updateOne(filter, update))
+				.result;
 		}
 
 		/**
@@ -115,9 +119,11 @@ export function collectionConstructor(db: Connect) {
 		}) {
 			filter = fixDeep(filter || {});
 			delete document._id;
-			return (await this._collection()).replaceOne(filter, document, {
-				upsert,
-			});
+			return (
+				await (await this._collection()).replaceOne(filter, document, {
+					upsert,
+				})
+			).result;
 		}
 
 		/**
@@ -152,21 +158,25 @@ export function collectionConstructor(db: Connect) {
 			}
 
 			if (multi) {
-				return (await this._collection()).updateMany(
-					filter,
-					update as any,
-					{
-						upsert: true,
-					}
-				);
+				return (
+					await (await this._collection()).updateMany(
+						filter,
+						update as any,
+						{
+							upsert: true,
+						}
+					)
+				).result;
 			} else {
-				return (await this._collection()).updateOne(
-					filter,
-					update as any,
-					{
-						upsert: true,
-					}
-				);
+				return (
+					await (await this._collection()).updateOne(
+						filter,
+						update as any,
+						{
+							upsert: true,
+						}
+					)
+				).result;
 			}
 		}
 
@@ -176,7 +186,7 @@ export function collectionConstructor(db: Connect) {
 		 */
 		public async deleteMany({ filter }: { filter: Filter<S> }) {
 			filter = fixDeep(filter || {});
-			return (await this._collection()).deleteMany(filter);
+			return (await (await this._collection()).deleteMany(filter)).result;
 		}
 
 		/**
@@ -184,7 +194,7 @@ export function collectionConstructor(db: Connect) {
 		 */
 		public async deleteOne({ filter }: { filter: Filter<S> }) {
 			filter = fixDeep(filter || {});
-			return (await this._collection()).deleteOne(filter);
+			return (await (await this._collection()).deleteOne(filter)).result;
 		}
 
 		/**
