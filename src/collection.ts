@@ -1,20 +1,7 @@
 import { Connect } from "./connect";
-import { UpsertOperators } from "./interfaces/update";
+import { Filter, Keys, UpdateOperators, UpsertOperators } from "./interfaces";
 import { Model } from "./model";
-import {
-	InsertWriteOpResult,
-	UpdateWriteOpResult,
-	DeleteWriteOpResultObject,
-	Collection,
-	InsertOneWriteOpResult,
-} from "mongodb";
-
-import {
-	UpdateOperators,
-	Filter,
-	TopLevelQueryOperators,
-	Keys,
-} from "./interfaces";
+import * as MongoDB from "mongodb";
 
 export function collectionConstructor(db: Connect) {
 	return class CollectionC<S extends Model> {
@@ -270,6 +257,13 @@ export function collectionConstructor(db: Connect) {
 		}
 
 		/**
+		 * Removes an index on the db and collection.
+		 */
+		public async removeIndex({ key }: { key: Keys<S> | Keys<S>[] }) {
+			return await (await this._collection()).dropIndex(key as any);
+		}
+
+		/**
 		 * Renames the collection
 		 */
 		public async rename({
@@ -316,3 +310,13 @@ function fix$Pull$eq(updateQuery: any) {
 	}
 	return updateQuery;
 }
+
+export {
+	MongoDB,
+	Connect,
+	Filter,
+	Keys,
+	UpdateOperators,
+	UpsertOperators,
+	Model,
+};
