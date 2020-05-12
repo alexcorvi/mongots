@@ -1,4 +1,4 @@
-export { Keys, Partial } from "./common";
+export { Keys } from "./common";
 export {
 	TopLevelQueryOperators,
 	SchemaKeyFilters,

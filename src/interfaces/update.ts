@@ -1,4 +1,4 @@
-import { Keys, Partial } from "./common";
+import { Keys } from "./common";
 import { FieldLevelQueryOperators } from "./filter";
 
 export interface PushModifiers<V> {
