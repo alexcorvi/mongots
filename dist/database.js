@@ -8,9 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const collection_1 = require("./collection");
 const mongodb_1 = require("mongodb");
-class Connect {
+class Database {
     constructor({ url, db, options }) {
         this._database = undefined;
         this.connectionStr = url;
@@ -30,11 +29,5 @@ class Connect {
             return this._database;
         });
     }
-    /**
-     * Perform collection-level operations
-     */
-    collection(name) {
-        return new collection_1.Collection(name, this);
-    }
 }
-exports.Connect = Connect;
+exports.Database = Database;

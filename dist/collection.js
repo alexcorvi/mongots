@@ -15,14 +15,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const connect_1 = require("./connect");
-exports.Connect = connect_1.Connect;
+const database_1 = require("./database");
 const model_1 = require("./model");
 exports.Model = model_1.Model;
 const MongoDB = __importStar(require("mongodb"));
 exports.MongoDB = MongoDB;
-class Collection {
-    constructor(collectionName, connect) {
+class Collection extends database_1.Database {
+    constructor(params) {
+        super(params);
         /**
          * Aliases
          *
@@ -34,12 +34,11 @@ class Collection {
         this.distinct = this.readDistinct;
         this.removeOne = this.deleteOne;
         this.removeMany = this.deleteMany;
-        this._collectionName = collectionName;
-        this._db = connect;
+        this._collectionName = params.collectionName;
     }
     _collection() {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this._db.database()).collection(this._collectionName);
+            return (yield this.database()).collection(this._collectionName);
         });
     }
     /**

@@ -1,11 +1,13 @@
-import { Connect } from "./connect";
+import { Database } from "./database";
+import { ConnectionParams } from "./interfaces";
 import { Filter, Keys, UpdateOperators, UpsertOperators } from "./interfaces";
 import { Model } from "./model";
 import * as MongoDB from "mongodb";
-export declare class Collection<S extends Model> {
-    private _db;
+export declare class Collection<S extends Model> extends Database {
     _collectionName: string;
-    constructor(collectionName: string, connect: Connect);
+    constructor(params: ConnectionParams & {
+        collectionName: string;
+    });
     _collection(): Promise<MongoDB.Collection<any>>;
     /**
      * Put one document
@@ -151,4 +153,4 @@ export declare class Collection<S extends Model> {
         filter: Filter<S>;
     }) => Promise<MongoDB.DeleteWriteOpResultObject>;
 }
-export { MongoDB, Connect, Filter, Keys, UpdateOperators, UpsertOperators, Model, };
+export { MongoDB, Filter, Keys, UpdateOperators, UpsertOperators, Model };
