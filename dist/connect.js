@@ -18,6 +18,9 @@ class Connect {
         this.dbName = db;
         this.database();
     }
+    /**
+     * Perform database-level operations
+     */
     database() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this._database)
@@ -27,8 +30,11 @@ class Connect {
             return this._database;
         });
     }
-    get Collection() {
-        return collection_1.collectionConstructor(this);
+    /**
+     * Perform collection-level operations
+     */
+    collection(name) {
+        return new collection_1.Collection(name, this);
     }
 }
 exports.Connect = Connect;
