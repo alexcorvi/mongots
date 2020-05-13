@@ -59,7 +59,7 @@ class Employee extends Model {
     phoneNumbers: number[] = [];
 }
 
-const employees = new connection.collection<Employee>('employees');
+const employees = connection.collection<Employee>('employees');
 
 // now you can apply read/write operations on the collection
 
@@ -76,7 +76,7 @@ await employees.createOne({
 
 Here's a list of all the methods that are available on every collection:
 
-#### `collection.createOne`
+#### `collection('name').createOne`
 
 -   Description: Puts one document
 -   Params:
@@ -99,7 +99,7 @@ Promise<{
 }>
 ```
 
-#### `collection.createMany`
+#### `collection('name').createMany`
 
 -   Description: Puts multiple documents
 -   Params:
@@ -123,7 +123,7 @@ Promise<{
 }>
 ```
 
-#### `collection.read`
+#### `collection('name').read`
 
 -   Description: Finds documents that meets a specified criteria
 -   Params:
@@ -143,7 +143,7 @@ Promise<{
 Promise<Array<Schema>>
 ```
 
-#### `collection.updateMany`
+#### `collection('name').updateMany`
 
 -   Description: Updates many documents that meets the specified criteria
 -   Params:
@@ -193,22 +193,22 @@ Promise<{
 }>
 ```
 
-#### `collection.updateOne`
+#### `collection('name').updateOne`
 
 -   Description: Updates one document that meets the specified criteria
 -   Params:
 
 ```typescript
-// same as collection.updateMany
+// same as collection('name').updateMany
 ```
 
 -   Returns:
 
 ```typescript
-// same as collection.updateMany
+// same as collection('name').updateMany
 ```
 
-#### `collection.replaceOne`
+#### `collection('name').replaceOne`
 
 -   Description: Replaces one document that meets the specified criteria
 -   Params:
@@ -224,10 +224,10 @@ Promise<{
 -   Returns:
 
 ```typescript
-// same as collection.updateMany
+// same as collection('name').updateMany
 ```
 
-#### `collection.deleteMany`
+#### `collection('name').deleteMany`
 
 -   Description: Deletes many documents that meets the specified criteria
 -   Params:
@@ -250,22 +250,22 @@ Promise<{
 }>
 ```
 
-#### `collection.deleteOne`
+#### `collection('name').deleteOne`
 
 -   Description: Deletes one document that meets the specified criteria
 -   Params:
 
 ```typescript
-// same as collection.deleteMany
+// same as collection('name').deleteMany
 ```
 
 -   Returns:
 
 ```typescript
-// same as collection.deleteMany
+// same as collection('name').deleteMany
 ```
 
-#### `collection.readDistinct`
+#### `collection('name').readDistinct`
 
 -   Description: Returns a list of distinct values for the given key across a collection.
 -   Params:
@@ -283,7 +283,7 @@ Promise<{
 Promise<valueType[]>
 ```
 
-#### `collection.drop`
+#### `collection('name').drop`
 
 -   Description: Drops the collection totally, must pass the collection name, just to make sure you know what you're doing
 -   Params:
@@ -300,7 +300,7 @@ Promise<valueType[]>
 Promise<void>
 ```
 
-#### `collection.createIndex`
+#### `collection('name').createIndex`
 
 -   Description: Creates an index on the db and collection.
 -   Params:
@@ -321,7 +321,7 @@ Promise<void>
 Promise<string>
 ```
 
-#### `collection.rename`
+#### `collection('name').rename`
 
 -   Description: Renames the collection
 -   Params:
@@ -339,30 +339,30 @@ Promise<string>
 Promise<void>
 ```
 
-#### `collection.find`
+#### `collection('name').find`
 
-alias of `collection.read`
+alias of `collection('name').read`
 
-#### `collection.insert`
+#### `collection('name').insert`
 
-alias of `collection.createOne`
+alias of `collection('name').createOne`
 
-#### `collection.insertOne`
+#### `collection('name').insertOne`
 
-alias of `collection.createOne`
+alias of `collection('name').createOne`
 
-#### `collection.insertMany`
+#### `collection('name').insertMany`
 
-alias of `collection.createMany`
+alias of `collection('name').createMany`
 
-#### `collection.distinct`
+#### `collection('name').distinct`
 
-alias of `collection.readDistinct`
+alias of `collection('name').readDistinct`
 
-#### `collection.removeOne`
+#### `collection('name').removeOne`
 
-alias of `collection.deleteOne`
+alias of `collection('name').deleteOne`
 
-#### `collection.removeMany`
+#### `collection('name').removeMany`
 
-alias of `collection.deleteMany`
+alias of `collection('name').deleteMany`
