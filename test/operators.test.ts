@@ -1,7 +1,5 @@
-import { Connect } from "../src/connect";
-import { Model } from "../src/model";
+import { Collection, Model } from "../src";
 import { expect } from "chai";
-import { existsSync, unlinkSync } from "fs";
 
 interface Child {
 	name: string;
@@ -33,16 +31,15 @@ class Employee extends Model<Employee> {
 	}
 }
 
-const database = new Connect({
+const coll = new Collection<Employee>({
 	url: "mongodb://localhost:27017",
 	db: "test",
 	options: {
 		native_parser: true,
 		useUnifiedTopology: true,
 	},
+	collectionName: "testing-employees",
 });
-
-const coll = database.collection<Employee>("testing-employees");
 
 describe("Operators tests", () => {
 	beforeEach(async () => {

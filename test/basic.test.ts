@@ -1,4 +1,4 @@
-import { Connect } from "../src";
+import { Collection } from "../src";
 import { Model } from "../src/model";
 import { expect } from "chai";
 
@@ -15,16 +15,15 @@ class Employee extends Model {
 	numbers: number[] = [];
 }
 
-const database = new Connect({
+const employees = new Collection<Employee>({
 	url: "mongodb://localhost:27017",
 	db: "test",
 	options: {
 		native_parser: true,
 		useUnifiedTopology: true,
 	},
+	collectionName: "testing-employees",
 });
-
-const employees = database.collection<Employee>("testing-employees");
 
 describe("Basic test", () => {
 	before(async () => {
