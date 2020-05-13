@@ -1,9 +1,7 @@
-import { Collection } from "./collection";
 import { ConnectionParams } from "./interfaces";
-import { Model } from "./model";
 import { connect, Db, MongoClientOptions } from "mongodb";
 
-export class Connect {
+export class Database {
 	private connectionStr: string;
 	private dbName: string;
 	private options: MongoClientOptions;
@@ -28,12 +26,5 @@ export class Connect {
 		);
 		this._database = client.db(this.dbName);
 		return this._database;
-	}
-
-	/**
-	 * Perform collection-level operations
-	 */
-	collection<Schema extends Model>(name: string) {
-		return new Collection<Schema>(name, this);
 	}
 }
