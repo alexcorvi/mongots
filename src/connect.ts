@@ -1,5 +1,6 @@
-import { collectionConstructor } from "./collection";
+import { Collection } from "./collection";
 import { ConnectionParams } from "./interfaces";
+import { Model } from "./model";
 import { connect, Db, MongoClientOptions } from "mongodb";
 
 export class Connect {
@@ -16,6 +17,9 @@ export class Connect {
 		this.database();
 	}
 
+	/**
+	 * Perform database-level operations
+	 */
 	async database() {
 		if (this._database) return this._database;
 		const client = await connect(
@@ -26,7 +30,10 @@ export class Connect {
 		return this._database;
 	}
 
-	get Collection() {
-		return collectionConstructor(this);
+	/**
+	 * Perform collection-level operations
+	 */
+	collection<Schema extends Model>(name: string) {
+		return new Collection<Schema>(name, this);
 	}
 }
