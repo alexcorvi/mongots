@@ -38,10 +38,11 @@ const database = new Connect({
 	db: "test",
 	options: {
 		native_parser: true,
+		useUnifiedTopology: true,
 	},
 });
 
-const coll = new database.Collection<Employee>("testing-employees");
+const coll = database.collection<Employee>("testing-employees");
 
 describe("Operators tests", () => {
 	beforeEach(async () => {

@@ -20,10 +20,11 @@ const database = new Connect({
 	db: "test",
 	options: {
 		native_parser: true,
+		useUnifiedTopology: true,
 	},
 });
 
-const employees = new database.Collection<Employee>("testing-employees");
+const employees = database.collection<Employee>("testing-employees");
 
 describe("Basic test", () => {
 	before(async () => {
@@ -188,7 +189,7 @@ describe("Basic test", () => {
 			filter: { name: "alberto" },
 		});
 
-		expect(deleteOperation.deletedCount).eq(1);
+		expect(deleteOperation.result.n).eq(1);
 		expect(readOperation.length).eq(0);
 	});
 
@@ -218,7 +219,7 @@ describe("Basic test", () => {
 	});
 
 	it("Read Distinct", async () => {
-		const distinctNames = await employees.readDistinct<string>({
+		const distinctNames = await employees.readDistinct({
 			key: "name",
 		});
 		const name = distinctNames[0];
