@@ -19,13 +19,13 @@ export class Collection<S extends Model> extends Database {
 	/**
 		 * Execute an aggregation framework pipeline against the collection, needs MongoDB >= 2.2
 		 */
-	public async aggregate({
+	public async aggregate<T>({
 		pipeline, options
 	}: {
 		pipeline: object[],
 		options?: MongoDB.CollectionAggregationOptions
-	}): Promise<any[]> {
-		const cursor = (await this._collection()).aggregate(pipeline, options);
+	}): Promise<T[]> {
+		const cursor = (await this._collection()).aggregate<T>(pipeline, options);
 		return await cursor.toArray();
 	}
 

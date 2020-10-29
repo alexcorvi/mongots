@@ -239,7 +239,7 @@ describe("Basic test", () => {
 	});
 
 	it("Aggregate data", async () => {
-		const operation = await employees.aggregate({
+		const operation = await employees.aggregate<{ _id: number, count: number }>({
 			pipeline: [
 				{
 					$match: { salary: 99 },

@@ -12,10 +12,10 @@ export declare class Collection<S extends Model> extends Database {
     /**
          * Execute an aggregation framework pipeline against the collection, needs MongoDB >= 2.2
          */
-    aggregate({ pipeline, options }: {
+    aggregate<T>({ pipeline, options }: {
         pipeline: object[];
         options?: MongoDB.CollectionAggregationOptions;
-    }): Promise<any[]>;
+    }): Promise<T[]>;
     /**
      * Put one document
      */
