@@ -22,6 +22,18 @@ export declare class Collection<S extends Model> extends Database {
         documents: S[];
     }): Promise<MongoDB.InsertWriteOpResult<S>>;
     /**
+     * Find one document
+     */
+    findOne({ filter, skip, limit, sort, }: {
+        filter?: Filter<S>;
+        skip?: number;
+        limit?: number;
+        sort?: {
+            key: string;
+            direction: number;
+        };
+    }): Promise<S | any>;
+    /**
      * Find documents that meets a specified criteria
      */
     read({ filter, skip, limit, sort, }: {
