@@ -17,6 +17,19 @@ export class Collection<S extends Model> extends Database {
 	}
 
 	/**
+		 * Execute an aggregation framework pipeline against the collection, needs MongoDB >= 2.2
+		 */
+	public async aggregate({
+		pipeline, options
+	}: {
+		pipeline: object[],
+		options?: MongoDB.CollectionAggregationOptions
+	}): Promise<any[]> {
+		const cursor = (await this._collection()).aggregate(pipeline, options);
+		return await cursor.toArray();
+	}
+
+	/**
 	 * Put one document
 	 */
 	public async createOne({
@@ -113,9 +126,11 @@ export class Collection<S extends Model> extends Database {
 	public async updateOne({
 		filter,
 		update,
+		options
 	}: {
 		filter: Filter<S>;
 		update: UpdateOperators<S>;
+		options?: { upsert: boolean }
 	}): Promise<MongoDB.UpdateWriteOpResult> {
 		filter = fixDeep(filter || {});
 		update = fix$Pull$eq(update);
@@ -125,7 +140,7 @@ export class Collection<S extends Model> extends Database {
 		if (update.$unset) {
 			update.$unset = fixDeep(update.$unset);
 		}
-		return await (await this._collection()).updateOne(filter, update);
+		return await (await this._collection()).updateOne(filter, update, options);
 	}
 
 	/**

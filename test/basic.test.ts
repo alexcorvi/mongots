@@ -238,6 +238,23 @@ describe("Basic test", () => {
 		expect(typeof operation).eq("string");
 	});
 
+	it("Aggregate data", async () => {
+		const operation = await employees.aggregate({
+			pipeline: [
+				{
+					$match: { salary: 99 },
+				},
+				{
+					$group: {
+						_id: "$salary",
+						count: { $sum: 1 }
+					}
+				}
+			]
+		});
+		expect(operation[0].count).eq(5);
+	});
+
 	it("Drop Collection", async () => {
 		const operation = await employees.drop({ name: "testing-employees" });
 		const read = await employees.read({});
