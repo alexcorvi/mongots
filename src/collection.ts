@@ -39,6 +39,24 @@ export class Collection<S extends Model> extends Database {
 	}
 
 	/**
+	 * Find one document
+	 */
+	public async findOne({
+		filter,
+		skip,
+		limit,
+		sort = undefined,
+	}: {
+		filter?: Filter<S>;
+		skip?: number;
+		limit?: number;
+		sort?: { key: string; direction: number };
+	}): Promise<S | any> {
+		filter = fixDeep(filter || {});
+		return (await this._collection()).findOne<S>(filter);
+	}
+
+	/**
 	 * Find documents that meets a specified criteria
 	 */
 	public async read({
@@ -123,8 +141,9 @@ export class Collection<S extends Model> extends Database {
 		upsert?: boolean;
 	}): Promise<MongoDB.ReplaceWriteOpResult> {
 		filter = fixDeep(filter || {});
-		delete document._id;
-		return await (await this._collection()).replaceOne(filter, document, {
+		let replaceDoc: any = document;
+		delete replaceDoc._id; // must be any type to be able to delete _id
+		return await (await this._collection()).replaceOne(filter, replaceDoc, {
 			upsert,
 		});
 	}
