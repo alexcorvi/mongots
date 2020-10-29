@@ -56,6 +56,15 @@ class Collection extends database_1.Database {
         });
     }
     /**
+         * Execute an aggregation framework pipeline against the collection, needs MongoDB >= 2.2
+         */
+    aggregate({ pipeline, options }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const cursor = (yield this._collection()).aggregate(pipeline, options);
+            return yield cursor.toArray();
+        });
+    }
+    /**
      * Put one document
      */
     createOne({ document, }) {
@@ -120,7 +129,7 @@ class Collection extends database_1.Database {
     /**
      * Update one document that meets the specified criteria
      */
-    updateOne({ filter, update, }) {
+    updateOne({ filter, update, options }) {
         return __awaiter(this, void 0, void 0, function* () {
             filter = fixDeep(filter || {});
             update = fix$Pull$eq(update);
@@ -130,7 +139,7 @@ class Collection extends database_1.Database {
             if (update.$unset) {
                 update.$unset = fixDeep(update.$unset);
             }
-            return yield (yield this._collection()).updateOne(filter, update);
+            return yield (yield this._collection()).updateOne(filter, update, options);
         });
     }
     /**

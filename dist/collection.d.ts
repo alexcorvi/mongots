@@ -10,6 +10,13 @@ export declare class Collection<S extends Model> extends Database {
     });
     _collection(): Promise<MongoDB.Collection<any>>;
     /**
+         * Execute an aggregation framework pipeline against the collection, needs MongoDB >= 2.2
+         */
+    aggregate({ pipeline, options }: {
+        pipeline: object[];
+        options?: MongoDB.CollectionAggregationOptions;
+    }): Promise<any[]>;
+    /**
      * Put one document
      */
     createOne({ document, }: {
@@ -55,9 +62,12 @@ export declare class Collection<S extends Model> extends Database {
     /**
      * Update one document that meets the specified criteria
      */
-    updateOne({ filter, update, }: {
+    updateOne({ filter, update, options }: {
         filter: Filter<S>;
         update: UpdateOperators<S>;
+        options?: {
+            upsert: boolean;
+        };
     }): Promise<MongoDB.UpdateWriteOpResult>;
     /**
      * Replaces one document that meets the specified criteria
