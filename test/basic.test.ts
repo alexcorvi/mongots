@@ -101,10 +101,9 @@ describe("Basic test", () => {
 	it("Read all / length", async () => {
 		expect((await employees.find({})).length).eq(10);
 	});
-	it("Read one / doc", async () => {
-		const docs = await employees.find({ filter: { name: "samy" } });
-		expect(docs.length).eq(1);
-		expect(docs[0].salary).eq(2);
+	it("Find one / doc", async () => {
+		const doc = await employees.findOne({ filter: { name: "samy" } });
+		expect(doc.salary).eq(2);
 	});
 	it("Limit, skip & sort", async () => {
 		const operationA = await employees.read({
@@ -206,11 +205,11 @@ describe("Basic test", () => {
 	it("Count Documents", async () => {
 		await employees.insertMany({
 			documents: [
-				Employee.new({ salary: 99 }),
-				Employee.new({ salary: 99 }),
-				Employee.new({ salary: 99 }),
-				Employee.new({ salary: 99 }),
-				Employee.new({ salary: 99 }),
+				Employee.new({ name: "john", salary: 99 }),
+				Employee.new({ name: "alex", salary: 99 }),
+				Employee.new({ name: "robert", salary: 99 }),
+				Employee.new({ name: "peet", salary: 99 }),
+				Employee.new({ name: "sarah", salary: 99 }),
 			],
 		});
 		const count = await employees.count({ filter: { salary: 99 } });
@@ -237,6 +236,23 @@ describe("Basic test", () => {
 			sparse: true,
 		});
 		expect(typeof operation).eq("string");
+	});
+
+	it("Aggregate data", async () => {
+		const operation = await employees.aggregate<{ _id: number, count: number }>({
+			pipeline: [
+				{
+					$match: { salary: 99 },
+				},
+				{
+					$group: {
+						_id: "$salary",
+						count: { $sum: 1 }
+					}
+				}
+			]
+		});
+		expect(operation[0].count).eq(5);
 	});
 
 	it("Drop Collection", async () => {

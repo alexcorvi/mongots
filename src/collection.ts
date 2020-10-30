@@ -17,6 +17,19 @@ export class Collection<S extends Model> extends Database {
 	}
 
 	/**
+		 * Execute an aggregation framework pipeline against the collection, needs MongoDB >= 2.2
+		 */
+	public async aggregate<T>({
+		pipeline, options
+	}: {
+		pipeline: object[],
+		options?: MongoDB.CollectionAggregationOptions
+	}): Promise<T[]> {
+		const cursor = (await this._collection()).aggregate<T>(pipeline, options);
+		return await cursor.toArray();
+	}
+
+	/**
 	 * Put one document
 	 */
 	public async createOne({
@@ -36,6 +49,24 @@ export class Collection<S extends Model> extends Database {
 		documents: S[];
 	}): Promise<MongoDB.InsertWriteOpResult<S>> {
 		return await (await this._collection()).insertMany(documents);
+	}
+
+	/**
+	 * Find one document
+	 */
+	public async findOne({
+		filter,
+		skip,
+		limit,
+		sort = undefined,
+	}: {
+		filter?: Filter<S>;
+		skip?: number;
+		limit?: number;
+		sort?: { key: string; direction: number };
+	}): Promise<S | any> {
+		filter = fixDeep(filter || {});
+		return (await this._collection()).findOne<S>(filter);
 	}
 
 	/**
@@ -95,9 +126,11 @@ export class Collection<S extends Model> extends Database {
 	public async updateOne({
 		filter,
 		update,
+		options
 	}: {
 		filter: Filter<S>;
 		update: UpdateOperators<S>;
+		options?: { upsert: boolean }
 	}): Promise<MongoDB.UpdateWriteOpResult> {
 		filter = fixDeep(filter || {});
 		update = fix$Pull$eq(update);
@@ -107,7 +140,7 @@ export class Collection<S extends Model> extends Database {
 		if (update.$unset) {
 			update.$unset = fixDeep(update.$unset);
 		}
-		return await (await this._collection()).updateOne(filter, update);
+		return await (await this._collection()).updateOne(filter, update, options);
 	}
 
 	/**
@@ -123,8 +156,9 @@ export class Collection<S extends Model> extends Database {
 		upsert?: boolean;
 	}): Promise<MongoDB.ReplaceWriteOpResult> {
 		filter = fixDeep(filter || {});
-		delete document._id;
-		return await (await this._collection()).replaceOne(filter, document, {
+		let replaceDoc: any = document;
+		delete replaceDoc._id; // must be any type to be able to delete _id
+		return await (await this._collection()).replaceOne(filter, replaceDoc, {
 			upsert,
 		});
 	}

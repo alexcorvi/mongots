@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.uid = exports.Model = void 0;
 class Model {
     constructor() {
         this._id = uid();
